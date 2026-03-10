@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:background="@drawable/fondo_pro"
+    android:padding="20dp">
+
+    <TextView
+        android:id="@+id/textViewTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="¡PRIMERO, PIEDRA!"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="100dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="80dp">
+
+        <ImageView
+            android:id="@+id/imageViewRock"
+            android:layout_width="85dp"
+            android:layout_height="156dp"
+            android:layout_marginEnd="15dp"
+            android:src="@drawable/descargapiedra" />
+
+        <ImageView
+            android:id="@+id/imageViewPaper"
+            android:layout_width="174dp"
+            android:layout_height="183dp"
+            android:layout_marginEnd="15dp"
+            android:src="@drawable/descargapapel" />
+
+        <ImageView
+            android:id="@+id/imageViewScissors"
+            android:layout_width="89dp"
+            android:layout_height="112dp"
+            android:src="@drawable/descargatijeras" />
+
+    </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Introduce tu nombre:"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#0B0000"
+        android:layout_marginBottom="10dp"/>
+
+    <EditText
+        android:id="@+id/etNombreUsuario"
+        android:layout_width="300dp"
+        android:layout_height="60dp"
+        android:hint="Escribe aquí..."
+        android:padding="15dp"
+        android:inputType="textPersonName" />
+    <Button
+        android:id="@+id/btnJugar"
+        android:layout_width="200dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="30dp"
+        android:text="¡A JUGAR!"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#E91E63"
+        android:elevation="5dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#FF69B4"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+
+    </LinearLayout>
+
+</LinearLayout>

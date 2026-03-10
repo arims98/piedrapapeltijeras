@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <item
+        android:id="@+id/item_reinicio"
+        android:title="Reiniciar Partida"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/item_salir"
+        android:title="Cerrar Sesión"
+        app:showAsAction="never" />
+</menu>
