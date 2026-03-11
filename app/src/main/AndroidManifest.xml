@@ -13,7 +13,7 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
         <activity
-            android:name=".PantallaCarga"
+            android:name=".View.PantallaCarga"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,10 +22,10 @@
         </activity>
 
         <activity
-            android:name=".Login"
+            android:name=".View.Login"
             android:exported="false" />
         <activity
-            android:name=".View.Juego"
+            android:name=".View.JuegoView"
             android:exported="false" />
 
 

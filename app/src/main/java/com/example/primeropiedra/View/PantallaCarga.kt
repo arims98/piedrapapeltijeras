@@ -1,12 +1,11 @@
-package com.example.primeropiedra
+package com.example.primeropiedra.View
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.content.Intent
-
-
+import androidx.appcompat.app.AppCompatActivity
+import com.example.primeropiedra.R
 
 class PantallaCarga: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

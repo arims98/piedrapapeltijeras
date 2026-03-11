@@ -1,15 +1,12 @@
-package com.example.primeropiedra
+package com.example.primeropiedra.View
 
-import androidx.appcompat.app.AppCompatActivity
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.widget.Button
 import android.widget.EditText
-import android.widget.Toast // También lo necesitaremos para los mensajes
-import com.example.primeropiedra.View.Juego
-
+import androidx.appcompat.app.AppCompatActivity
+import com.example.primeropiedra.R
+import com.example.primeropiedra.*
 
 class Login: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,9 +23,10 @@ class Login: AppCompatActivity() {
             //4. Comprobamos si no estávacio para que no juegue nadie sin nombre
             if (nombreEscrito.isNotEmpty()) {
                 //Pasamos a la pantalla de juego(las siguiente), llevando el nombre
-                val intent = Intent(this, Juego::class.java)
+                val intent = Intent(this, JuegoView::class.java)
                 intent.putExtra("NOMBRE_JUGADOR", nombreEscrito)
                 startActivity(intent)
+                finish()
             } else
                 //Si no escribio nada y le ha dado al boton
                 jugadorNombre.error="Por favor, escribe tu nombre"

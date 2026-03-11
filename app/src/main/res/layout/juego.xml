@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="#E91E63"
-        app:title="Piedra, Papel, Tijera"
+        app:title="¡Primero, Piedra!"
         app:titleTextColor="#FFFFFF"
         android:elevation="4dp" />
 
@@ -38,6 +38,17 @@
             android:textStyle="bold"
             android:layout_marginStart="8dp" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/Mensajes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:text=""
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        android:textStyle="bold" />
 
     <ImageView
         android:id="@+id/manoPC"
@@ -103,16 +114,6 @@
         android:text="¡START!"
         android:textColor="#FFFFFF"
         android:textSize="20sp"
-        android:textStyle="bold" />
-    <TextView
-        android:id="@+id/crono"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp"
-        android:text="00:00:00"
-        android:textColor="#FFFFFF"
-        android:textSize="18dp"
         android:textStyle="bold" />
 
 </LinearLayout>

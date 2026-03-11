@@ -10,15 +10,79 @@ El salpicadero (Juego.kt) solo te enseña una aguja moviéndose, pero no sabe po
 En Android, se inventó el ViewModel por un problema de "memoria". Si tú giras el móvil, Android destruye y vuelve a crear Juego.kt. Si tus monedas estaban ahí, ¡pum!, desaparecen.
 El ViewModel es una "caja fuerte" que sobrevive a ese giro. Por eso el profesor lo pide: porque es la forma profesional de que no se pierdan los datos.*/
 
-package com.example.primeropiedra.ViewModel //Decimos la ubicacion de la carpeta
+package com.example.primeropiedra.ViewModel
 
 import androidx.lifecycle.MutableLiveData
-// Imagina que MutableLiveData es una "pizarra mágica" que permite que otros (la pantalla) vean cuando el valor cambia.
-// Si no lo importas, Android no sabe qué es esa pizarra.
+import androidx.lifecycle.ViewModel
 
-import androidx.lifecycle.ViewModel //Importamos la "caja fuerte" básica de Android sobre la que vamos a construir nuestro motor.
+// Heredamos de ViewModel para que Android sepa que esta es la "caja fuerte"
+class JuegoViewModel : ViewModel() {
 
+    // MutableLiveData es una "pizarra" que cambia.
+    // La View (Juego.kt) estará mirando estas pizarras.
+    val monedas = MutableLiveData<Int>(10)
+    val victoriasJugador = MutableLiveData<Int>(0)
+    val victoriasIA = MutableLiveData<Int>(0)
+    val Marcador = MutableLiveData<String>("Juego 0 - Jugador 0")
+    val eleccionIA = MutableLiveData<Int>()
+    val mensajeEstado = MutableLiveData<String>() // Como una pizarra para el mensaje del estado de cada jugada
+    private var nombreUsuario: String = "" // Es para quitar los toast y poner texto de verdad
+    private var tiempoInicio: Long = 0
 
-class JuegoViewModel : ViewModel() { // Aquí creamos nuestra clase. Al poner los dos puntos y ViewModel(), //
-// le decimos a Android: "Hereda todas las funciones de una caja fuerte". Esto es lo que permite que los datos no se borren al girar el móvil.
+    // Función para recibir el nombre del Login
+    fun setNombreJugador(nombre: String) {
+        nombreUsuario = nombre
+        actualizarMarcador()
+    }
+
+    // El motor decide qué número saca la máquina
+    fun jugar(eleccionJugador: Int) {
+        val random = (1..3).random()
+        eleccionIA.value = random // Escribe en la pizarra, la View lo verá
+
+        // Lógica de quién gana (el motor calcula)
+        if (eleccionJugador == random) {
+            mensajeEstado.value = "¡Empate en esta ronda!"
+        } else if ((eleccionJugador == 1 && random == 3) ||
+            (eleccionJugador == 2 && random == 1) ||
+            (eleccionJugador == 3 && random == 2)
+        ) {
+            victoriasJugador.value = (victoriasJugador.value ?: 0) + 1
+            mensajeEstado.value = "¡Punto para $nombreUsuario!"
+        } else {
+            victoriasIA.value = (victoriasIA.value ?: 0) + 1
+            mensajeEstado.value = "La máquina gana..."
+        }
+        actualizarMarcador()
+    }
+    private fun actualizarMarcador() {
+        Marcador.value = "PC ${victoriasIA.value} - $nombreUsuario ${victoriasJugador.value}"
+    }
+    fun iniciarPartida() {
+        victoriasJugador.value = 0
+        victoriasIA.value = 0
+        actualizarMarcador()
+    }
+    fun calcularResultadoFinal() {
+        val vJ = victoriasJugador.value ?: 0
+        val vIA = victoriasIA.value ?: 0
+
+        if ( vJ >= 5) {
+            monedas.value = (monedas.value ?: 0) +5
+            mensajeEstado.value = "¡VICTORIA TOTAL!!! +5 MONEDAS"
+        } else if (vIA >= 5) {
+            monedas.value = (monedas.value ?: 0) -2
+            mensajeEstado.value = "OOOOOOH... DERROTAAA... -2 MONEDAS"
+        }
+    }
+    fun iniciarCronometro() {
+        // Guardamos el momento exacto en milisegundos, en el que empieza
+        tiempoInicio = System.currentTimeMillis()
+    }
+    fun obtenerDuracionSegundos(): Int {
+        val tiempoFin = System.currentTimeMillis()
+        // Calculamos la diferencia y pasamos de milisegundos a segundos
+        return ((tiempoFin - tiempoInicio) / 1000).toInt()
+    }
+
 }
