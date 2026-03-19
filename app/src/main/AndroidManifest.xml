@@ -25,6 +25,9 @@
             android:name=".View.Login"
             android:exported="false" />
         <activity
+            android:name=".View.Menu"
+            android:exported="false" />
+        <activity
             android:name=".View.JuegoView"
             android:exported="false" />
 

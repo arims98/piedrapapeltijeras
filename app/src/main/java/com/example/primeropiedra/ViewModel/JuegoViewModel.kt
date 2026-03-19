@@ -14,6 +14,12 @@ package com.example.primeropiedra.ViewModel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import android.content.Context
+import com.example.primeropiedra.Model.DBHelper
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+
 
 // Heredamos de ViewModel para que Android sepa que esta es la "caja fuerte"
 class JuegoViewModel : ViewModel() {
@@ -28,6 +34,8 @@ class JuegoViewModel : ViewModel() {
     val mensajeEstado = MutableLiveData<String>() // Como una pizarra para el mensaje del estado de cada jugada
     private var nombreUsuario: String = "" // Es para quitar los toast y poner texto de verdad
     private var tiempoInicio: Long = 0
+    private lateinit var db: DBHelper // La inicializamos mas tarde
+    private val disposables = CompositeDisposable() // Para cuando utilizad RxJava y el usuario cierra la app, no se pierda nada
 
     // Función para recibir el nombre del Login
     fun setNombreJugador(nombre: String) {
@@ -83,6 +91,42 @@ class JuegoViewModel : ViewModel() {
         val tiempoFin = System.currentTimeMillis()
         // Calculamos la diferencia y pasamos de milisegundos a segundos
         return ((tiempoFin - tiempoInicio) / 1000).toInt()
+    }
+    fun iniBaseDatos(context: Context) {
+        db = DBHelper(context)
+    }
+    //Para registrar la partida en la base de datos
+    fun registrarPartidaBD(duracion: Int, fecha: String) {
+        val nombre = nombreUsuario
+        val totalMonedas = monedas.value ?: 0
+
+        // Chibato, para ver que falla
+        disposables.add(
+            db.guardarPartidaAsync(nombre, totalMonedas, fecha, duracion)
+                .observeOn(io.reactivex.rxjava3.android.schedulers.AndroidSchedulers.mainThread())
+                .subscribe({
+                    println("DEBUG: ¡Guardado con éxito!") // CHIVATO 2
+                    mensajeEstado.value = "Partida guardada"
+                }, { error ->
+                    println("DEBUG: Error al guardar: ${error.message}") // CHIVATO 3
+                })
+        )
+
+        /* Guardamos la tarea en la bolsa, usando add
+        disposables.add(
+            db.guardarPartidaAsync(nombre, totalMonedas, fecha, duracion)
+                .observeOn(io.reactivex.rxjava3.android.schedulers.AndroidSchedulers.mainThread())
+                .subscribe({
+                    mensajeEstado.value = "Partida guardada en el historial"
+                }, { error ->
+                    mensajeEstado.value = "Error al guardar: ${error.message}"
+                })
+        )*/
+    }
+    // Limpiamos cuando el viewmodel se destruya, para no gastar tanta RAM o bateria cuando el usuario sale del juego
+    override fun onCleared() {
+        super.onCleared()
+        disposables.clear()
     }
 
 }

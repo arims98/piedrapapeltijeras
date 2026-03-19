@@ -25,7 +25,6 @@ class JuegoView : AppCompatActivity() {
     // Importante: Asegúrate de tener la dependencia activity-ktx en el build.gradle
     private val viewModel: JuegoViewModel by viewModels()
     var nombreJugador: String = "" // Aqui guardamos el nombre del jugador
-
     lateinit var btnPiedra: ImageView
     lateinit var btnPapel: ImageView
     lateinit var btnTijeras: ImageView
@@ -34,17 +33,26 @@ class JuegoView : AppCompatActivity() {
     lateinit var marcador: TextView
     lateinit var manoPC: ImageView
     lateinit var Mensajes: TextView
+    private var segundosTranscurridos = 0
+    private var runnable: Runnable? = null
+    private val handler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.juego)
+
         // Capturamos el nombre y lo guardamos en nuestra variable global
          val nombreJugador = intent.getStringExtra("NOMBRE_JUGADOR") ?: "Jugador"
+
         // Le pasamos el nombre al JuegoViewModel
         viewModel.setNombreJugador(nombreJugador)
+
         //El marcador
         marcador = findViewById(R.id.marcador)
+
         val nombre = intent.getStringExtra("NOMBRE_JUGADOR")
+
+        viewModel.iniBaseDatos(this) // Para conectar la base de datos con la vista
 
         manoPC = findViewById(R.id.manoPC)
         btnStart = findViewById(R.id.btnStart)
@@ -65,6 +73,7 @@ class JuegoView : AppCompatActivity() {
         btnStart.setOnClickListener {
             viewModel.iniciarPartida() //El JuegoViewModel, resetea los números
             viewModel.iniciarCronometro()
+            iniciarVisualCrono()
            btnStart.visibility = View.GONE // Lo ocultamos al empezar
             activamosManos()
             Toast.makeText(this, "¡Partida iniciada!", Toast.LENGTH_SHORT).show()
@@ -86,7 +95,6 @@ class JuegoView : AppCompatActivity() {
             }, 2000)
         }
     }
-
     fun jugar(eleccionJugador: Int) {
         desactivamosManos()
         viewModel.jugar(eleccionJugador) //El motor hace el random y suma puntos
@@ -106,19 +114,29 @@ class JuegoView : AppCompatActivity() {
         }, 3000) //Son 3segundos
 
     }
-
     fun finalizarPartida() {
+        detenerCronoVisual()
+
         viewModel.calcularResultadoFinal()
+
+        val segundos = viewModel.obtenerDuracionSegundos()
+        val fechaHoy = obtenerFechaActual()
+
+        // Ahora a la base de datos
+        viewModel.registrarPartidaBD(segundos, fechaHoy)
+
+        // Ahora lo hacemos visual
         desactivamosManos()
         btnStart.visibility = View.VISIBLE
         btnStart.isEnabled = true
         btnStart.text = "REINTENTAR"
     }
-
     fun desactivamosManos() {
+
         btnPiedra.isClickable = false
         btnPapel.isClickable = false
         btnTijeras.isClickable = false
+
         //Bajamos la opacidad para que se vean que estas desactivados
         btnPapel.alpha = 0.5f
         btnPiedra.alpha = 0.5f
@@ -126,9 +144,11 @@ class JuegoView : AppCompatActivity() {
     }
 
     fun activamosManos() {
+
         btnPiedra.isClickable = true
         btnPapel.isClickable = true
         btnTijeras.isClickable = true
+
         // Subimos la opacidad
         btnPapel.alpha = 1.0f
         btnPiedra.alpha = 1.0f
@@ -178,5 +198,31 @@ class JuegoView : AppCompatActivity() {
                 3 -> manoPC.setImageResource(R.drawable.descargatijeras)
             }
         }
+    }
+    fun obtenerFechaActual(): String {
+        val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+        return sdf.format(Date())
+    }
+    fun iniciarVisualCrono() {
+        // Ponemos la fecha actual al empezar
+        findViewById<TextView>(R.id.tvFechaSesion).text = "Fecha: ${obtenerFechaActual()}"
+
+        segundosTranscurridos = 0
+        runnable = object : Runnable {
+            override fun run() {
+                segundosTranscurridos++
+                val minutos = segundosTranscurridos / 60
+                val segundos = segundosTranscurridos % 60
+                // Formateamos para que siempre tenga dos dígitos (00:00)
+                findViewById<TextView>(R.id.tvCronometro).text =
+                    String.format("Tiempo: %02d:%02d", minutos, segundos)
+
+                handler.postDelayed(this, 1000) // Se ejecuta cada segundo
+            }
+        }
+        handler.postDelayed(runnable!!, 1000)
+    }
+    fun detenerCronoVisual() {
+        runnable?.let { handler.removeCallbacks(it) }
     }
 }
