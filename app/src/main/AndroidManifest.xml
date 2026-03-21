@@ -30,6 +30,9 @@
         <activity
             android:name=".View.JuegoView"
             android:exported="false" />
+        <activity
+            android:name=".View.HistorialView"
+            android:exported="false" />
 
 
     </application>

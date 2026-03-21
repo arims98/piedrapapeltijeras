@@ -47,7 +47,11 @@ class Menu : AppCompatActivity() {
 
 
         }
-        btnHistorial.setOnClickListener {}
+        btnHistorial.setOnClickListener {
+            val intent = Intent(this, HistorialView::class.java)
+            startActivity(intent)
+
+        }
         btnConfiguracion.setOnClickListener {}
 
     }

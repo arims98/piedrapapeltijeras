@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.rxjava3.core.Single //Para ir a la base de datos y que traiga la lista y avise que termina
 
 class DBHelper ( context: Context) : SQLiteOpenHelper(context, "JuegoDB", null, 1) {
 
@@ -39,5 +40,30 @@ class DBHelper ( context: Context) : SQLiteOpenHelper(context, "JuegoDB", null, 
             db.insert("Historial", null, values)
         }.subscribeOn(Schedulers.io()) // Esto hace que se guarde en segundo plano (Asíncrono)
 
+    }
+
+    fun obtenerHistorialAsync(): Single<List<PartidaTabla>> {
+        return Single.fromCallable {
+            val listaPartidas = mutableListOf<PartidaTabla>()
+            val db = this.readableDatabase
+            val cursor = db.rawQuery("SELECT * FROM Historial ORDER BY id DESC", null)
+
+            cursor?.use {
+                if (it.moveToFirst()) {
+                    do {
+                        val partida = PartidaTabla(
+                            id = it.getInt(it.getColumnIndexOrThrow("id")),
+                            nombre = it.getString(it.getColumnIndexOrThrow("nombre")),
+                            monedas = it.getInt(it.getColumnIndexOrThrow("monedas")),
+                            fecha = it.getString(it.getColumnIndexOrThrow("fecha")),
+                            duracion = it.getInt(it.getColumnIndexOrThrow("duracion"))
+                        )
+                        listaPartidas.add(partida)
+                    } while (it.moveToNext())
+                }
+            }
+            // .toList() convierte la MutableList en la List que espera el Single
+            listaPartidas.toList()
+        }.subscribeOn(Schedulers.io())
     }
 }
