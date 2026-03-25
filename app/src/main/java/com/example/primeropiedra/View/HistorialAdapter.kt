@@ -16,6 +16,9 @@ class HistorialAdapter(private  val lista: List<PartidaTabla>) :
             val nombre : TextView = view.findViewById(R.id.txtNombre)
             val monedas : TextView = view.findViewById(R.id.txtMonedas)
             val fechas: TextView = view.findViewById(R.id.txtFecha)
+            val duracion: TextView = view.findViewById(R.id.txtduracion)
+            val resultadoJugador: TextView = view.findViewById(R.id.minimarcadorJugador)
+            val resultadoIA: TextView = view.findViewById(R.id.minimarcadorIA)
         }
     // Creamos la fila: infla el xml item_historial
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CajasHistorial {
@@ -29,6 +32,9 @@ class HistorialAdapter(private  val lista: List<PartidaTabla>) :
         holder.nombre.text = "Jugador: ${partidaActual.nombre}"
         holder.monedas.text = "${partidaActual.monedas} \uD83D\uDCB0"
         holder.fechas.text = "Fecha: ${partidaActual.fecha}"
+        holder.duracion.text = "Duracion: ${partidaActual.duracion}"
+        holder.resultadoJugador.text = "Resultado: ${partidaActual.resultadoJugador}"
+        holder.resultadoIA.text = "- ${partidaActual.resultadoIA}"
     }
     // Contamos las partidas que haya
     override fun getItemCount(): Int {

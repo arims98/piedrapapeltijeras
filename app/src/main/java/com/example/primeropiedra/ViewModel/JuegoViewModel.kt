@@ -15,9 +15,9 @@ package com.example.primeropiedra.ViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import android.content.Context
+import android.widget.TextView
 import com.example.primeropiedra.Model.DBHelper
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.schedulers.Schedulers
+import com.example.primeropiedra.Model.PartidaTabla
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 
@@ -99,29 +99,21 @@ class JuegoViewModel : ViewModel() {
     fun registrarPartidaBD(duracion: Int, fecha: String) {
         val nombre = nombreUsuario
         val totalMonedas = monedas.value ?: 0
+        val puntosJugador = victoriasJugador.value ?: 0
+        val puntosIA = victoriasIA.value ?: 0
 
-        // Chibato, para ver que falla
-        disposables.add(
-            db.guardarPartidaAsync(nombre, totalMonedas, fecha, duracion)
-                .observeOn(io.reactivex.rxjava3.android.schedulers.AndroidSchedulers.mainThread())
-                .subscribe({
-                    println("DEBUG: ¡Guardado con éxito!") // CHIVATO 2
-                    mensajeEstado.value = "Partida guardada"
-                }, { error ->
-                    println("DEBUG: Error al guardar: ${error.message}") // CHIVATO 3
-                })
-        )
+        val nuevaPartida = PartidaTabla(0, nombre, totalMonedas, fecha, duracion, puntosJugador, puntosIA)
 
-        /* Guardamos la tarea en la bolsa, usando add
+        // Guardamos la tarea en la bolsa, usando add
         disposables.add(
-            db.guardarPartidaAsync(nombre, totalMonedas, fecha, duracion)
+            db.guardarPartidaAsync(nuevaPartida)
                 .observeOn(io.reactivex.rxjava3.android.schedulers.AndroidSchedulers.mainThread())
                 .subscribe({
                     mensajeEstado.value = "Partida guardada en el historial"
                 }, { error ->
                     mensajeEstado.value = "Error al guardar: ${error.message}"
                 })
-        )*/
+        )
     }
     // Limpiamos cuando el viewmodel se destruya, para no gastar tanta RAM o bateria cuando el usuario sale del juego
     override fun onCleared() {

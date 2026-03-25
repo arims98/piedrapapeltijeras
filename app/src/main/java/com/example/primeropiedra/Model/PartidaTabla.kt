@@ -5,5 +5,7 @@ data class PartidaTabla (
     val nombre: String,
     val monedas: Int,
     val fecha: String,
-    val duracion: Int
+    val duracion: Int,
+    val resultadoJugador: Int,
+    val resultadoIA: Int
 )

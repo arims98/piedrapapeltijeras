@@ -25,7 +25,7 @@ class Login: AppCompatActivity() {
             //4. Comprobamos si no estávacio para que no juegue nadie sin nombre
             if (nombreEscrito.isNotEmpty()) {
                 //Pasamos a la pantalla de juego(las siguiente), llevando el nombre
-                val intent = Intent(this, Menu::class.java)
+                val intent = Intent(this, MenuInicial::class.java)
                 intent.putExtra("NOMBRE_JUGADOR", nombreEscrito)
                 startActivity(intent)
                 finish()

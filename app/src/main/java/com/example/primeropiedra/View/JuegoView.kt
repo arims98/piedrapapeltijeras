@@ -99,17 +99,19 @@ class JuegoView : AppCompatActivity() {
         desactivamosManos()
         viewModel.jugar(eleccionJugador) //El motor hace el random y suma puntos
 
+        val vJugador = viewModel.victoriasJugador.value ?: 0
+        val vIA = viewModel.victoriasIA.value ?: 0
+
+        if (vJugador >= 5 || vIA >= 5) {
+            finalizarPartida()
+        }
+
         // Esperamos 3 segundos y escondemos la mano del PC para la siguiente ronda
         Handler(Looper.getMainLooper()).postDelayed({
             manoPC.visibility = View.INVISIBLE
 
-            val vJugador = viewModel.victoriasJugador.value ?: 0
-            val vIA = viewModel.victoriasIA.value ?: 0
-
             if (vJugador < 5 && vIA < 5) {
                 activamosManos()
-            } else {
-                finalizarPartida()
             }
         }, 3000) //Son 3segundos
 
