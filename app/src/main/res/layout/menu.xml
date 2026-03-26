@@ -3,24 +3,27 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/tu_archivo_de_rayas"> <androidx.appcompat.widget.Toolbar
-    android:id="@+id/toolbar"
-    android:layout_width="match_parent"
-    android:layout_height="?attr/actionBarSize"
-    android:background="#E91E63"
-    android:elevation="0dp"
-    app:title="Primero, Piedra"
-    app:titleTextColor="@color/white"
-    app:layout_constraintTop_toTopOf="parent" />
+    android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/imgToldo"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:scaleType="fitXY"
-        android:src="@drawable/toldo_tienda"
-        android:elevation="5dp"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+        <View android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="#F06292" />
+        <View android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="#F48FB1" />
+        <View android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="#F06292" />
+        <View android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="#F48FB1" />
+        <View android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="#F06292" />
+        <View android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="#F48FB1" />
+    </LinearLayout>
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#E91E63"
+        app:title="¡Primero, Piedra!"
+        app:titleTextColor="@color/white"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
@@ -28,23 +31,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="TOP PARTIDAS:"
-        android:textSize="18sp"
+        android:text="TOP 3 Supervivientes"
+        android:textSize="24sp"
         android:textStyle="bold"
-        android:textColor="@color/black"
-        app:layout_constraintTop_toBottomOf="@id/imgToldo"
+        android:textColor="#FFFFFF"
+        android:shadowColor="#000000"
+        android:shadowDx="2"
+        android:shadowDy="2"
+        android:shadowRadius="2"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardHistorial"
         android:layout_width="0dp"
-        android:layout_height="180dp"
-        android:layout_marginHorizontal="30dp"
-        android:layout_marginTop="10dp"
-        app:cardBackgroundColor="#F06292"
+        android:layout_height="160dp"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="12dp"
+        app:cardBackgroundColor="#F8BBCE"
         app:cardCornerRadius="25dp"
-        app:cardElevation="4dp"
+        app:cardElevation="6dp"
         app:layout_constraintTop_toBottomOf="@id/tvTituloTop"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -52,49 +59,42 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvMiniHistorial"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="10dp" />
+            android:layout_height="match_parent" />
     </androidx.cardview.widget.CardView>
 
     <Button
         android:id="@+id/btnJugar"
         android:layout_width="220dp"
-        android:layout_height="60dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="24dp"
+        android:textStyle="bold"
         android:text="JUGAR"
         android:backgroundTint="#E91E63"
-        android:textColor="@color/white"
-        android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/cardHistorial"
-        app:layout_constraintBottom_toTopOf="@id/btnHistorial"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
         android:id="@+id/btnHistorial"
         android:layout_width="220dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="15dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="12dp"
+        android:textStyle="bold"
         android:text="HISTORIAL"
         android:backgroundTint="#E91E63"
-        android:textColor="@color/white"
-        android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/btnJugar"
-        app:layout_constraintBottom_toTopOf="@id/btnConfiguracion"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
         android:id="@+id/btnConfiguracion"
         android:layout_width="220dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="15dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="12dp"
+        android:textStyle="bold"
         android:text="CONFIGURACIÓN"
         android:backgroundTint="#E91E63"
-        android:textColor="@color/white"
-        android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/btnHistorial"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

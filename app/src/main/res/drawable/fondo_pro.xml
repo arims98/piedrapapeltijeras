@@ -6,19 +6,33 @@
         </shape>
     </item>
 
-    <item android:left="40dp" android:right="300dp">
-        <shape android:shape="rectangle"><solid android:color="#F06292" /></shape>
+    <item android:left="0dp" android:right="320dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#F06292" />
+        </shape>
     </item>
 
-    <item android:left="130dp" android:right="210dp">
-        <shape android:shape="rectangle"><solid android:color="#F06292" /></shape>
+    <item android:left="80dp" android:right="240dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#F06292" />
+        </shape>
     </item>
 
-    <item android:left="220dp" android:right="120dp">
-        <shape android:shape="rectangle"><solid android:color="#F08BAE" /></shape>
+    <item android:left="160dp" android:right="160dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#F06292" />
+        </shape>
     </item>
 
-    <item android:left="310dp" android:right="30dp">
-        <shape android:shape="rectangle"><solid android:color="#F06292" /></shape>
+    <item android:left="240dp" android:right="80dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#F06292" />
+        </shape>
+    </item>
+
+    <item android:left="320dp" android:right="0dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#F06292" />
+        </shape>
     </item>
 </layer-list>

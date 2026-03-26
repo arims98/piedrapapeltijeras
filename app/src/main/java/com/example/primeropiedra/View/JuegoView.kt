@@ -41,11 +41,9 @@ class JuegoView : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.juego)
 
-        // Capturamos el nombre y lo guardamos en nuestra variable global
-         val nombreJugador = intent.getStringExtra("NOMBRE_JUGADOR") ?: "Jugador"
-
         // Le pasamos el nombre al JuegoViewModel
-        viewModel.setNombreJugador(nombreJugador)
+        val nombreRecuperado = intent.getStringExtra("nombreUsuario") ?: "Invitado"
+        viewModel.setNombreJugador(nombreRecuperado, this)
 
         //El marcador
         marcador = findViewById(R.id.marcador)
@@ -71,19 +69,18 @@ class JuegoView : AppCompatActivity() {
         observamosDatos()
 
         btnStart.setOnClickListener {
+            activamosManos()
             viewModel.iniciarPartida() //El JuegoViewModel, resetea los números
             viewModel.iniciarCronometro()
             iniciarVisualCrono()
            btnStart.visibility = View.GONE // Lo ocultamos al empezar
-            activamosManos()
+
             Toast.makeText(this, "¡Partida iniciada!", Toast.LENGTH_SHORT).show()
         }
 
         btnPiedra.setOnClickListener { jugar(1) }
         btnPapel.setOnClickListener { jugar(2) }
         btnTijeras.setOnClickListener { jugar(3) }
-
-        Toast.makeText(this, "Bienvenido $nombre. Tienes ${viewModel.monedas.value} monedas", Toast.LENGTH_LONG).show()
 
         viewModel.mensajeEstado.observe(this) { mensaje ->
             Mensajes.text = mensaje
@@ -113,7 +110,7 @@ class JuegoView : AppCompatActivity() {
             if (vJugador < 5 && vIA < 5) {
                 activamosManos()
             }
-        }, 3000) //Son 3segundos
+        }, 2000) //Son 2 segundos
 
     }
     fun finalizarPartida() {
@@ -135,9 +132,9 @@ class JuegoView : AppCompatActivity() {
     }
     fun desactivamosManos() {
 
-        btnPiedra.isClickable = false
-        btnPapel.isClickable = false
-        btnTijeras.isClickable = false
+        btnPiedra.isEnabled = false
+        btnPapel.isEnabled = false
+        btnTijeras.isEnabled = false
 
         //Bajamos la opacidad para que se vean que estas desactivados
         btnPapel.alpha = 0.5f
@@ -147,9 +144,9 @@ class JuegoView : AppCompatActivity() {
 
     fun activamosManos() {
 
-        btnPiedra.isClickable = true
-        btnPapel.isClickable = true
-        btnTijeras.isClickable = true
+        btnPiedra.isEnabled = true
+        btnPapel.isEnabled = true
+        btnTijeras.isEnabled = true
 
         // Subimos la opacidad
         btnPapel.alpha = 1.0f

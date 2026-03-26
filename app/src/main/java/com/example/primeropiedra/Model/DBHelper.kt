@@ -87,6 +87,21 @@ class DBHelper ( context: Context) : SQLiteOpenHelper(context, "JuegoDB", null, 
             listaPartidas.toList()
         }.subscribeOn(Schedulers.io())
     }
+    // Busca la última partida de ese nombre y devuelve las monedas
+    fun obtenerUltimasMonedas(nombreBusqueda: String): Int {
+        val db = this.readableDatabase
+        val cursor = db.rawQuery(
+            "SELECT monedas FROM Historial WHERE nombre = ? ORDER BY id DESC LIMIT 1",
+            arrayOf(nombreBusqueda)
+        )
+
+        var monedasEncontradas = 10 // Valor por defecto si es nuevo
+        if (cursor.moveToFirst()) {
+            monedasEncontradas = cursor.getInt(0)
+        }
+        cursor.close()
+        return monedasEncontradas
+    }
 
 
 }

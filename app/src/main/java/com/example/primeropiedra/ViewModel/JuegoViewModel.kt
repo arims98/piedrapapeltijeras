@@ -29,7 +29,7 @@ class JuegoViewModel : ViewModel() {
     val monedas = MutableLiveData<Int>(10)
     val victoriasJugador = MutableLiveData<Int>(0)
     val victoriasIA = MutableLiveData<Int>(0)
-    val Marcador = MutableLiveData<String>("Juego 0 - Jugador 0")
+    val Marcador = MutableLiveData<String>("Jugador - Rival 0")
     val eleccionIA = MutableLiveData<Int>()
     val mensajeEstado = MutableLiveData<String>() // Como una pizarra para el mensaje del estado de cada jugada
     private var nombreUsuario: String = "" // Es para quitar los toast y poner texto de verdad
@@ -38,8 +38,20 @@ class JuegoViewModel : ViewModel() {
     private val disposables = CompositeDisposable() // Para cuando utilizad RxJava y el usuario cierra la app, no se pierda nada
 
     // Función para recibir el nombre del Login
-    fun setNombreJugador(nombre: String) {
+    fun setNombreJugador(nombre: String, context: Context) {
         nombreUsuario = nombre
+
+        // 1. Inicializamos la base de datos si no lo está
+        if (!::db.isInitialized) {
+            db = DBHelper(context)
+        }
+
+        // 2. Buscamos si "Ari" ya tiene dinero guardado de partidas anteriores
+        val saldoRecuperado = db.obtenerUltimasMonedas(nombre)
+
+        // 3. Actualizamos la pizarra de monedas con lo que hemos encontrado
+        monedas.value = saldoRecuperado
+
         actualizarMarcador()
     }
 
@@ -64,7 +76,11 @@ class JuegoViewModel : ViewModel() {
         actualizarMarcador()
     }
     private fun actualizarMarcador() {
-        Marcador.value = "PC ${victoriasIA.value} - $nombreUsuario ${victoriasJugador.value}"
+        val vJ = victoriasJugador.value ?: 0
+        val vIA = victoriasIA.value ?: 0
+
+        // Formato: Nombre: PuntosJugador - PuntosIA Rival
+        Marcador.value = "$nombreUsuario $vJ - $vIA Rival"
     }
     fun iniciarPartida() {
         victoriasJugador.value = 0

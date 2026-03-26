@@ -59,14 +59,9 @@ class MenuInicial : AppCompatActivity() {
         Toast.makeText(this, "Bienvenido $nombreJugador", Toast.LENGTH_LONG).show()
 
         btnJugar.setOnClickListener {
-            val ticket = Intent(this, JuegoView::class.java) // Para ir a la pantalla siguiente del juego
-            ticket.putExtra("NOMBRE_JUGADOR", nombreJugador) // Para tambien llevar a la siguiente pantalla,datos extras
-
+            val ticket = Intent(this, JuegoView::class.java)
+            ticket.putExtra("nombreUsuario", nombreJugador)
             startActivity(ticket)
-
-            // Le pasamos el nombre al JuegoViewModel
-            viewModel.setNombreJugador(nombreJugador)
-
 
         }
         btnHistorial.setOnClickListener {
