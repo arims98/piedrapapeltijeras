@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="#E91E63"
-            app:title="Historial de Partidas"
+            app:title="¡Primero, Piedra!"
             app:titleTextColor="#FFFFFF"
             android:elevation="4dp" />
 

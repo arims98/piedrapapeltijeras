@@ -39,13 +39,18 @@ class MenuInicial : AppCompatActivity() {
         val nombreJugador = intent.getStringExtra("NOMBRE_JUGADOR") ?: "Jugador"
 
         // 2. Configuramos el mini recycler
-                rvMini = findViewById(R.id.rvMiniHistorial)
+        rvMini = findViewById(R.id.rvMiniHistorial)
         rvMini.layoutManager = LinearLayoutManager(this)
 
-        // 3. Llamamos a la función
-        cargarMiniHistorial()
-
-
+        dbHelper.obtenerHistorialTOP() // <--- Esta es la que SÍ tienes en el DBHelper
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ listaTop ->
+                // Usamos el adapter pasándole 'true' para que no salgan las monedas
+                val adapter = HistorialAdapter(listaTop, true)
+                rvMini.adapter = adapter
+            }, { error ->
+                Log.e("ErrorDB", "No cargó el Top: ${error.message}")
+            })
 
         viewModel.iniBaseDatos(this) // Para conectar la base de datos con la vista
 
@@ -71,9 +76,6 @@ class MenuInicial : AppCompatActivity() {
         }
         btnConfiguracion.setOnClickListener {}
 
-
-
-
     }
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_navegacion, menu)
@@ -82,17 +84,13 @@ class MenuInicial : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.item_salir -> {
-                val intent = android.content.Intent(this, Login::class.java)
-                // Las flags limpian las pantallas anteriores para que no pueda volver hacia atras
-                intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
-                finish()
-                true
-            }
-            //  La flecha de atrás de la propia Toolbar (ID estándar de Android)
+            
             android.R.id.home -> {
                 finish() // Simplemente cierra esta pantalla y vuelve a la anterior
+                true
+            }
+            R.id.item_cerrar_sesion -> {
+                finish()
                 true
             }
             else -> super.onOptionsItemSelected(item) //Aqui debo poner para ir a la pagina de login

@@ -161,24 +161,43 @@ class JuegoView : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.item_reinicio -> {
-                // Aquí podrías resetear incluso las monedas si quieres
-                viewModel.iniciarPartida() //Usamos el reset del motor
-                btnStart.visibility = View.VISIBLE
-                btnStart.text = "¡START"
-                desactivamosManos()
-                Toast.makeText(this, "JUEGO RESETEADO", Toast.LENGTH_SHORT).show()
-                true
-            }
+            // ---BOTONES---
 
-            R.id.item_salir -> {
-                // Cerramos esta actividad y volvemos a la anterior (Login)
+            R.id.casita -> {
+                // El icono de la casa te devuelve al Menú Principal (Login)
                 finish()
                 true
             }
 
-            else -> super.onOptionsItemSelected(item) //Aqui debo poner para ir a la pagina de login
+            R.id.action_ayuda_inicio -> {
+                // Aquí puedes llamar a la función que te pasé antes para el cartel de ayuda
+                mostrarPopUpAyuda()
+                true
+            }
+
+            // --- TUS BOTONES DE "TRES PUNTITOS" ---
+
+            R.id.item_cerrar_sesion -> {
+                // Si quieres que cerrar sesión haga algo distinto a solo salir
+                finish()
+                true
+            }
+
+            R.id.item_musica -> {
+                Toast.makeText(this, "Ajustes de música próximamente", Toast.LENGTH_SHORT).show()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    // Función auxiliar para que el botón de ayuda (?) haga algo
+    private fun mostrarPopUpAyuda() {
+        android.app.AlertDialog.Builder(this)
+            .setTitle("Reglas del Juego")
+            .setMessage("• Piedra > Tijera\n• Papel > Piedra\n• Tijera > Papel\n\n¡Gana el primero que llegue a 5 puntos!")
+            .setPositiveButton("Entendido", null)
+            .show()
     }
     private fun observamosDatos() {
         // Cuando cambie el marcador en el JuegoViewModel, actualizamos el TextView del marcador

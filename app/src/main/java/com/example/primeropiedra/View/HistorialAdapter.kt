@@ -9,7 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.primeropiedra.Model.PartidaTabla
 import com.example.primeropiedra.R
 
-class HistorialAdapter(private val lista: List<PartidaTabla>) :
+class HistorialAdapter(private val lista: List<PartidaTabla>,
+    private val esTOP: Boolean = false) :
     RecyclerView.Adapter<HistorialAdapter.CajasHistorial>() {
 
     class CajasHistorial(view: View) : RecyclerView.ViewHolder(view) {
@@ -39,6 +40,15 @@ class HistorialAdapter(private val lista: List<PartidaTabla>) :
 
         // Unimos el marcador en una sola línea
         holder.tvMarcadorFinal.text = "${partidaActual.resultadoJugador} — ${partidaActual.resultadoIA}"
+
+        // --- LÓGICA PARA MOSTRAR O ESCONDER MONEDAS ---
+        if (esTOP) {
+            holder.tvMonedasTotal.visibility = View.GONE
+            // Si tienes un icono de moneda, también: holder.ivMonedaIcono.visibility = View.GONE
+        } else {
+            holder.tvMonedasTotal.visibility = View.VISIBLE
+            holder.tvMonedasTotal.text = "${partidaActual.monedas}"
+        }
 
         // Lógica de Victoria/Derrota (A 5 victorias)
         if (partidaActual.resultadoJugador >= 5) {

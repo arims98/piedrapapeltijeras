@@ -1,14 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <item
+        android:id="@+id/action_ayuda_inicio"
+        android:icon="@android:drawable/ic_menu_help"
+        android:title="Cómo jugar"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/casita"
+        android:icon="@drawable/hogarsfondo"
+        android:title="Inicio"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/item_idioma"
+        android:title="Cambiar Idioma"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/item_musica"
+        android:title="Música"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/item_animacion"
+        android:title="Ajustes de Animaciones"
+        app:showAsAction="never" />
 
     <item
-        android:id="@+id/item_reinicio"
-        android:title="Reiniciar Partida"
-        app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/item_salir"
+        android:id="@+id/item_cerrar_sesion"
         android:title="Cerrar Sesión"
         app:showAsAction="never" />
+
 </menu>

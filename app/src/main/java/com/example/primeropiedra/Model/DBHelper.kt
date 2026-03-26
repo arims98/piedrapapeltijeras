@@ -65,7 +65,20 @@ class DBHelper ( context: Context) : SQLiteOpenHelper(context, "JuegoDB", null, 
         return Single.fromCallable {
             val listaPartidas = mutableListOf<PartidaTabla>()
             val db = this.readableDatabase
-            val cursor = db.rawQuery("SELECT id, nombre, SUM(monedas) as Monedas, SUM(resultadoJugador) as totalJugador, SUM(resultadoIA) as totalMaquina, MAX(fecha) as ultimaFecha, SUM(duracion) as totalduracion FROM Historial GROUP BY nombre ORDER BY totalJugador DESC, Monedas DESC, totalduracion DESC LIMIT 3", null)
+
+            // EXPLICACIÓN DEL NUEVO ORDEN:
+            // 1. resultadoJugador DESC: Primero los que llegaron a 5.
+            // 2. resultadoIA ASC: Entre los que ganaron, primero el que recibió menos puntos (el 5-0).
+            // 3. duracion ASC: Si hay empate en marcador, el más rápido gana el puesto.
+
+            val sql = """
+            SELECT id, nombre, monedas, fecha, duracion, resultadoJugador, resultadoIA 
+            FROM Historial 
+            ORDER BY resultadoJugador DESC, resultadoIA ASC, duracion ASC 
+            LIMIT 3
+        """.trimIndent()
+
+            val cursor = db.rawQuery(sql, null)
 
             cursor?.use {
                 if (it.moveToFirst()) {
@@ -73,17 +86,16 @@ class DBHelper ( context: Context) : SQLiteOpenHelper(context, "JuegoDB", null, 
                         val partida = PartidaTabla(
                             id = it.getInt(it.getColumnIndexOrThrow("id")),
                             nombre = it.getString(it.getColumnIndexOrThrow("nombre")),
-                            monedas = it.getInt(it.getColumnIndexOrThrow("Monedas")),
-                            fecha = it.getString(it.getColumnIndexOrThrow("ultimaFecha")),
-                            duracion = it.getInt(it.getColumnIndexOrThrow("totalduracion")),
-                            resultadoJugador = it.getInt(it.getColumnIndexOrThrow("totalJugador")),
-                            resultadoIA = it.getInt(it.getColumnIndexOrThrow("totalMaquina"))
+                            monedas = it.getInt(it.getColumnIndexOrThrow("monedas")), // Lo cargamos internamente pero no lo mostraremos
+                            fecha = it.getString(it.getColumnIndexOrThrow("fecha")),
+                            duracion = it.getInt(it.getColumnIndexOrThrow("duracion")),
+                            resultadoJugador = it.getInt(it.getColumnIndexOrThrow("resultadoJugador")),
+                            resultadoIA = it.getInt(it.getColumnIndexOrThrow("resultadoIA"))
                         )
                         listaPartidas.add(partida)
                     } while (it.moveToNext())
                 }
             }
-            // .toList() convierte la MutableList en la List que espera el Single
             listaPartidas.toList()
         }.subscribeOn(Schedulers.io())
     }

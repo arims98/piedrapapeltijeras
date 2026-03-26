@@ -63,17 +63,14 @@ class HistorialView : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.item_salir -> {
-                val intent = android.content.Intent(this, Login::class.java)
-                // Las flags limpian las pantallas anteriores para que no pueda volver hacia atras
-                intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
-                finish()
-                true
-            }
             //  La flecha de atrás de la propia Toolbar (ID estándar de Android)
             android.R.id.home -> {
                 finish() // Simplemente cierra esta pantalla y vuelve a la anterior
+                true
+            }
+            R.id.casita -> {
+                // El icono de la casa te devuelve al Menú Principal (Login)
+                finish()
                 true
             }
             else -> super.onOptionsItemSelected(item) //Aqui debo poner para ir a la pagina de login
