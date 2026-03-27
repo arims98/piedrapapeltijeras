@@ -1,6 +1,6 @@
-//Estamos en la carpeta View, esta clase Juego, solo se encarga de los findViewById, de los Toast y de cambiar las imagenes. No toma decisiones.
 package com.example.primeropiedra.View
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -19,12 +19,11 @@ import com.example.primeropiedra.ViewModel.JuegoViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import android.app.AlertDialog // Para los carteles de victoria/derrota profesionales
 
 class JuegoView : AppCompatActivity() {
-
-    // Importante: Asegúrate de tener la dependencia activity-ktx en el build.gradle
     private val viewModel: JuegoViewModel by viewModels()
-    var nombreJugador: String = "" // Aqui guardamos el nombre del jugador
+    var nombreJugador: String = ""
     lateinit var btnPiedra: ImageView
     lateinit var btnPapel: ImageView
     lateinit var btnTijeras: ImageView
@@ -41,17 +40,13 @@ class JuegoView : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.juego)
 
-        // Le pasamos el nombre al JuegoViewModel
+        // Recuperar nombre y configurar ViewModel
         val nombreRecuperado = intent.getStringExtra("nombreUsuario") ?: "Invitado"
         viewModel.setNombreJugador(nombreRecuperado, this)
+        viewModel.iniBaseDatos(this)
 
-        //El marcador
+        // Vincular vistas
         marcador = findViewById(R.id.marcador)
-
-        val nombre = intent.getStringExtra("NOMBRE_JUGADOR")
-
-        viewModel.iniBaseDatos(this) // Para conectar la base de datos con la vista
-
         manoPC = findViewById(R.id.manoPC)
         btnStart = findViewById(R.id.btnStart)
         btnPiedra = findViewById(R.id.piedraJugador)
@@ -60,21 +55,19 @@ class JuegoView : AppCompatActivity() {
         sacoMonedas = findViewById(R.id.sacoMonedas)
         Mensajes = findViewById(R.id.Mensajes)
 
-        // Para que el toolbar funcione
+        // Toolbar
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
         desactivamosManos()
-
         observamosDatos()
 
         btnStart.setOnClickListener {
             activamosManos()
-            viewModel.iniciarPartida() //El JuegoViewModel, resetea los números
+            viewModel.iniciarPartida()
             viewModel.iniciarCronometro()
             iniciarVisualCrono()
-           btnStart.visibility = View.GONE // Lo ocultamos al empezar
-
+            btnStart.visibility = View.GONE
             Toast.makeText(this, "¡Partida iniciada!", Toast.LENGTH_SHORT).show()
         }
 
@@ -84,17 +77,16 @@ class JuegoView : AppCompatActivity() {
 
         viewModel.mensajeEstado.observe(this) { mensaje ->
             Mensajes.text = mensaje
-            Mensajes.visibility = View.INVISIBLE
-
-            // Ahora para que desaparezca el mensaje 2 segundo despues
+            Mensajes.visibility = View.VISIBLE // Corregido a VISIBLE para que se vea el mensaje
             Handler(Looper.getMainLooper()).postDelayed({
                 Mensajes.visibility = View.INVISIBLE
             }, 2000)
         }
     }
+
     fun jugar(eleccionJugador: Int) {
         desactivamosManos()
-        viewModel.jugar(eleccionJugador) //El motor hace el random y suma puntos
+        viewModel.jugar(eleccionJugador)
 
         val vJugador = viewModel.victoriasJugador.value ?: 0
         val vIA = viewModel.victoriasIA.value ?: 0
@@ -103,52 +95,76 @@ class JuegoView : AppCompatActivity() {
             finalizarPartida()
         }
 
-        // Esperamos 3 segundos y escondemos la mano del PC para la siguiente ronda
         Handler(Looper.getMainLooper()).postDelayed({
             manoPC.visibility = View.INVISIBLE
-
             if (vJugador < 5 && vIA < 5) {
                 activamosManos()
             }
-        }, 2000) //Son 2 segundos
-
+        }, 2000)
     }
+
     fun finalizarPartida() {
         detenerCronoVisual()
-
         viewModel.calcularResultadoFinal()
 
         val segundos = viewModel.obtenerDuracionSegundos()
         val fechaHoy = obtenerFechaActual()
-
-        // Ahora a la base de datos
         viewModel.registrarPartidaBD(segundos, fechaHoy)
 
-        // Ahora lo hacemos visual
         desactivamosManos()
-        btnStart.visibility = View.VISIBLE
-        btnStart.isEnabled = true
-        btnStart.text = "REINTENTAR"
-    }
-    fun desactivamosManos() {
 
+        // --- LANZAMOS EL CARTEL DE VICTORIA O DERROTA ---
+        val ganoJugador = (viewModel.victoriasJugador.value ?: 0) >= 5
+        mostrarCartelFinal(
+            victoria = ganoJugador,
+            puntosJugador = viewModel.victoriasJugador.value ?: 0,
+            puntosIA = viewModel.victoriasIA.value ?: 0
+        )
+    }
+
+    // --- NUEVA FUNCIÓN PARA EL CARTEL PROFESIONAL ---
+    private fun mostrarCartelFinal(victoria: Boolean, puntosJugador: Int, puntosIA: Int) {
+        val builder = AlertDialog.Builder(this)
+
+        if (victoria) {
+            builder.setTitle("🏆 ¡VICTORIA MAGISTRAL!")
+            builder.setMessage("¡Enhorabuena! Has ganado por $puntosJugador a $puntosIA.\n¿Qué quieres hacer ahora?")
+            builder.setIcon(android.R.drawable.btn_star_big_on)
+        } else {
+            builder.setTitle("😢 DERROTA")
+            builder.setMessage("Vaya... la IA te ha ganado $puntosIA a $puntosJugador.\n¡Sigue practicando para el TOP 3!")
+            builder.setIcon(android.R.drawable.ic_delete)
+        }
+
+        builder.setPositiveButton("REINTENTAR") { _, _ ->
+            // Simulamos el click del botón start para reiniciar todo
+            btnStart.performClick()
+        }
+
+        builder.setNegativeButton("VER HISTORIAL") { _, _ ->
+            val intent = Intent(this, HistorialView::class.java)
+            startActivity(intent)
+            finish()
+        }
+
+        val dialog = builder.create()
+        dialog.setCancelable(false) // Obligamos a elegir una opción
+        dialog.show()
+    }
+
+    fun desactivamosManos() {
         btnPiedra.isEnabled = false
         btnPapel.isEnabled = false
         btnTijeras.isEnabled = false
-
-        //Bajamos la opacidad para que se vean que estas desactivados
         btnPapel.alpha = 0.5f
         btnPiedra.alpha = 0.5f
         btnTijeras.alpha = 0.5f
     }
 
     fun activamosManos() {
-
         btnPiedra.isEnabled = true
         btnPapel.isEnabled = true
         btnTijeras.isEnabled = true
-
-        // Subimos la opacidad
         btnPapel.alpha = 1.0f
         btnPiedra.alpha = 1.0f
         btnTijeras.alpha = 1.0f
@@ -161,28 +177,18 @@ class JuegoView : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            // ---BOTONES---
-
             R.id.casita -> {
-                // El icono de la casa te devuelve al Menú Principal (Login)
                 finish()
                 true
             }
-
             R.id.action_ayuda_inicio -> {
-                // Aquí puedes llamar a la función que te pasé antes para el cartel de ayuda
                 mostrarPopUpAyuda()
                 true
             }
-
-            // --- TUS BOTONES DE "TRES PUNTITOS" ---
-
             R.id.item_cerrar_sesion -> {
-                // Si quieres que cerrar sesión haga algo distinto a solo salir
                 finish()
                 true
             }
-
             R.id.item_musica -> {
                 Toast.makeText(this, "Ajustes de música próximamente", Toast.LENGTH_SHORT).show()
                 true
@@ -191,20 +197,18 @@ class JuegoView : AppCompatActivity() {
         }
     }
 
-    // Función auxiliar para que el botón de ayuda (?) haga algo
     private fun mostrarPopUpAyuda() {
-        android.app.AlertDialog.Builder(this)
+        AlertDialog.Builder(this)
             .setTitle("Reglas del Juego")
             .setMessage("• Piedra > Tijera\n• Papel > Piedra\n• Tijera > Papel\n\n¡Gana el primero que llegue a 5 puntos!")
             .setPositiveButton("Entendido", null)
             .show()
     }
+
     private fun observamosDatos() {
-        // Cuando cambie el marcador en el JuegoViewModel, actualizamos el TextView del marcador
         viewModel.Marcador.observe(this) { nuevoMarcador ->
             marcador.text = nuevoMarcador
         }
-        // Cuando cambien las monedas en el JuegoViewModel, actualizamos el saco
         viewModel.monedas.observe(this) { cantidad ->
             sacoMonedas.text = cantidad.toString()
         }
@@ -217,29 +221,28 @@ class JuegoView : AppCompatActivity() {
             }
         }
     }
+
     fun obtenerFechaActual(): String {
         val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
         return sdf.format(Date())
     }
-    fun iniciarVisualCrono() {
-        // Ponemos la fecha actual al empezar
-        findViewById<TextView>(R.id.tvFechaSesion).text = "Fecha: ${obtenerFechaActual()}"
 
+    fun iniciarVisualCrono() {
+        findViewById<TextView>(R.id.tvFechaSesion).text = "Fecha: ${obtenerFechaActual()}"
         segundosTranscurridos = 0
         runnable = object : Runnable {
             override fun run() {
                 segundosTranscurridos++
                 val minutos = segundosTranscurridos / 60
                 val segundos = segundosTranscurridos % 60
-                // Formateamos para que siempre tenga dos dígitos (00:00)
                 findViewById<TextView>(R.id.tvCronometro).text =
                     String.format("Tiempo: %02d:%02d", minutos, segundos)
-
-                handler.postDelayed(this, 1000) // Se ejecuta cada segundo
+                handler.postDelayed(this, 1000)
             }
         }
         handler.postDelayed(runnable!!, 1000)
     }
+
     fun detenerCronoVisual() {
         runnable?.let { handler.removeCallbacks(it) }
     }
