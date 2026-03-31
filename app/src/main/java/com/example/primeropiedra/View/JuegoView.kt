@@ -20,6 +20,14 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import android.app.AlertDialog // Para los carteles de victoria/derrota profesionales
+import android.graphics.Color
+import android.util.Log
+import android.widget.EditText
+import androidx.appcompat.widget.SearchView
+import androidx.recyclerview.widget.RecyclerView
+import com.example.primeropiedra.Model.DBHelper
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import androidx.recyclerview.widget.LinearLayoutManager
 
 class JuegoView : AppCompatActivity() {
     private val viewModel: JuegoViewModel by viewModels()
@@ -35,6 +43,9 @@ class JuegoView : AppCompatActivity() {
     private var segundosTranscurridos = 0
     private var runnable: Runnable? = null
     private val handler = Handler(Looper.getMainLooper())
+    lateinit var historialAdapter: HistorialAdapter
+    private lateinit var rvResultados: RecyclerView
+    private lateinit var dbHelper: DBHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +71,26 @@ class JuegoView : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         desactivamosManos()
+
         observamosDatos()
+
+        mostrarmensajejuego()
+
+        dbHelper = DBHelper(this)
+        rvResultados = findViewById(R.id.rvResultadosBusqueda)
+        rvResultados.layoutManager = LinearLayoutManager(this)
+
+// Cargar los datos para que el buscador tenga qué filtrar
+        dbHelper.obtenerHistorialAsync()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ listaCompleta ->
+                // Inicializamos el adapter con todos los datos de la BD
+                historialAdapter = HistorialAdapter(listaCompleta, false)
+                rvResultados.adapter = historialAdapter
+                Log.d("Busqueda", "Datos cargados correctamente: ${listaCompleta.size} partidas")
+            }, { error ->
+                Log.e("ErrorDB", "No se pudieron cargar los datos para el buscador: ${error.message}")
+            })
 
         btnStart.setOnClickListener {
             activamosManos()
@@ -127,7 +157,7 @@ class JuegoView : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
 
         if (victoria) {
-            builder.setTitle("🏆 ¡VICTORIA MAGISTRAL!")
+            builder.setTitle("🏆 ¡VICTORIA!")
             builder.setMessage("¡Enhorabuena! Has ganado por $puntosJugador a $puntosIA.\n¿Qué quieres hacer ahora?")
             builder.setIcon(android.R.drawable.btn_star_big_on)
         } else {
@@ -172,6 +202,40 @@ class JuegoView : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_navegacion, menu)
+        val searchItem = menu?.findItem(R.id.action_search)
+        val searchView = searchItem?.actionView as androidx.appcompat.widget.SearchView
+
+        searchView.queryHint = "Buscar partida..."
+
+        // Personalización de colores (para que no falle, usamos un try-catch o safe call)
+        val searchText = searchView.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)
+        searchText?.setTextColor(Color.BLACK)
+        searchText?.setHintTextColor(Color.GRAY)
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                // 1. Verificamos que el adapter esté inicializado para evitar crasheos
+                if (::historialAdapter.isInitialized) {
+
+                    if (newText.isNullOrEmpty()) {
+                        // 2. Si no hay texto, escondemos el listado de búsqueda y vemos el menú normal
+                        rvResultados.visibility = android.view.View.GONE
+                    } else {
+                        // 3. Si el usuario escribe, mostramos el listado de resultados encima de TODO
+                        rvResultados.visibility = android.view.View.VISIBLE
+
+                        // 4. Ejecutamos el filtrado con el texto que escribió el usuario
+                        historialAdapter.filtrar(newText)
+                    }
+                }
+                return true
+            }
+        })
+
         return true
     }
 
@@ -186,11 +250,15 @@ class JuegoView : AppCompatActivity() {
                 true
             }
             R.id.item_cerrar_sesion -> {
+                val intent = Intent(this, Login::class.java)
+
+                // 2. Limpiamos el historial de pantallas para que no pueda volver al juego
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+                startActivity(intent)
+
+                // 3. Cerramos esta pantalla
                 finish()
-                true
-            }
-            R.id.item_musica -> {
-                Toast.makeText(this, "Ajustes de música próximamente", Toast.LENGTH_SHORT).show()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -245,5 +313,20 @@ class JuegoView : AppCompatActivity() {
 
     fun detenerCronoVisual() {
         runnable?.let { handler.removeCallbacks(it) }
+    }
+    private fun mostrarmensajejuego() {
+        val builder = android.app.AlertDialog.Builder(this)
+        builder.setTitle("¡Empieza el juego!")
+        builder.setMessage("¡Consigue 5 Victorias y gana a la IA!")
+
+        val dialog = builder.create()
+        dialog.show()
+
+        // PROGRAMAMOS EL CIERRE AUTOMÁTICO (a los 2.5 segundos)
+        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+            if (dialog.isShowing) {
+                dialog.dismiss()
+            }
+        }, 4000)
     }
 }

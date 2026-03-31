@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="#E91E63"
-            app:title="¡Primero, Piedra!"
+            app:title="¡A JUGAR!"
             app:titleTextColor="#FFFFFF"
             android:elevation="4dp" />
 
@@ -63,10 +63,12 @@
                 android:layout_alignParentEnd="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
+
                 <ImageView
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:src="@drawable/descargasaca" />
+
                 <TextView
                     android:id="@+id/sacoMonedas"
                     android:layout_width="wrap_content"
@@ -155,4 +157,14 @@
             android:textStyle="bold" />
 
     </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvResultadosBusqueda"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:background="#F8BBD0"
+        android:visibility="gone"
+        android:elevation="15dp" />
+
 </FrameLayout>

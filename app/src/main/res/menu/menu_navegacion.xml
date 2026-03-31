@@ -2,27 +2,28 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
-        android:id="@+id/action_ayuda_inicio"
-        android:icon="@android:drawable/ic_menu_help"
-        android:title="Cómo jugar"
-        app:showAsAction="always" />
+
     <item
         android:id="@+id/casita"
         android:icon="@drawable/hogarsfondo"
         android:title="Inicio"
         app:showAsAction="always" />
     <item
-        android:id="@+id/item_idioma"
-        android:title="Cambiar Idioma"
-        app:showAsAction="never" />
+        android:id="@+id/action_search"
+        android:title="Buscar"
+        android:icon="@android:drawable/ic_menu_search"
+        app:showAsAction="always|collapseActionView"
+        app:actionViewClass="androidx.appcompat.widget.SearchView" />
+
     <item
-        android:id="@+id/item_musica"
-        android:title="Música"
-        app:showAsAction="never" />
+        android:id="@+id/action_ayuda_inicio"
+        android:icon="@android:drawable/ic_menu_help"
+        android:title="Cómo jugar"
+        app:showAsAction="always" />
+
     <item
-        android:id="@+id/item_animacion"
-        android:title="Ajustes de Animaciones"
+        android:id="@+id/item_configuracion"
+        android:title="Configuración"
         app:showAsAction="never" />
 
     <item

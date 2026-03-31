@@ -31,52 +31,67 @@
             android:textSize="32sp"
             android:textStyle="bold"
             android:textColor="#FFFFFF"
-            android:layout_marginTop="60dp"
-            android:layout_marginBottom="40dp" />
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="10dp"
+            android:shadowColor="#000000"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="2" />
+
+        <ImageView
+            android:id="@+id/ivManosF"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:src="@drawable/manosf"
+            android:scaleType="centerInside"
+            android:layout_marginBottom="10dp" />
 
         <TextView
             android:id="@+id/tvManual"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="50dp"
-            android:text="Manual de Supervivencia:\n\n1. Escoge tu arma (piedra, papel o tijeras)\n2. Vence a la IA a 5 victorias\n3. ¡Gana monedas!"
-            android:textSize="17sp"
+            android:text="Manual de Supervivencia\n1. Escoge tu arma\n2. Vence a la IA\n          3. ¡Gana monedas!"
+            android:textSize="16sp"
             android:textStyle="italic"
             android:textColor="#212121"
-            android:gravity="center_horizontal" />
+            android:gravity="center_horizontal"
+            android:background="@drawable/fondo_instrucciones_redondeado"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="25dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
             android:text="Introduce tu nombre:"
-            android:textSize="22sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="#0B0000"
-            android:layout_marginBottom="10dp"/>
+            android:layout_marginBottom="5dp"/>
 
         <EditText
             android:id="@+id/etNombreUsuario"
             android:layout_width="280dp"
-            android:layout_height="60dp"
+            android:layout_height="55dp"
             android:hint="Escribe aquí..."
             android:background="@android:drawable/editbox_background"
-            android:padding="15dp"
+            android:padding="12dp"
             android:inputType="textPersonName"
-            android:layout_marginBottom="30dp"/>
+            android:layout_marginBottom="20dp"/>
 
         <Button
             android:id="@+id/btnEntrar"
             android:layout_width="200dp"
-            android:layout_height="60dp"
+            android:layout_height="55dp"
             android:text="ENTRAR"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="#FFFFFF"
             android:backgroundTint="#E91E63"
             android:elevation="5dp" />
 
     </LinearLayout>
-
 </FrameLayout>

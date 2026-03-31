@@ -42,7 +42,7 @@
                 android:id="@+id/tvNombreHistorial"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="NOMBRE JUGADOR"
+                android:text="Nombre"
                 android:textColor="#333333"
                 android:textSize="14sp"
                 android:textStyle="bold"

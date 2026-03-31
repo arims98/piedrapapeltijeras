@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="#E91E63"
-            app:title="¡Primero, Piedra!"
+            app:title="HISTORIAL"
             app:titleTextColor="#FFFFFF"
             android:elevation="4dp" />
 
@@ -39,12 +39,13 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:layout_marginBottom="15dp"
                 android:text="Últimas batallas"
                 android:textColor="#FFFFFF"
-                android:textSize="24sp"
+                android:textSize="28sp"
                 android:textStyle="bold"
-                android:shadowColor="#000000"
+                android:shadowColor="#44000000"
                 android:shadowDx="2"
                 android:shadowDy="2"
                 android:shadowRadius="2" />
@@ -59,4 +60,30 @@
 
         </LinearLayout>
     </LinearLayout>
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/btnIrPodio"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="65dp"
+        android:layout_marginEnd="16dp"
+        android:padding="10dp"
+        android:src="@drawable/podio"
+        android:background="#E91E63"
+        android:elevation="6dp"
+        android:scaleType="centerInside"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.SmallComponent"
+        app:strokeColor="#000000"
+        app:strokeWidth="2dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvResultadosBusqueda"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:background="#F8BBD0"
+        android:visibility="gone"
+        android:elevation="15dp" />
+
 </FrameLayout>

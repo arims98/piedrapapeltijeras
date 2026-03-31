@@ -1,14 +1,17 @@
 package com.example.primeropiedra.View
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import com.example.primeropiedra.R
 import com.example.primeropiedra.ViewModel.JuegoViewModel
 import kotlin.getValue
@@ -28,6 +31,8 @@ class MenuInicial : AppCompatActivity() {
     lateinit var btnConfiguracion: Button
     private lateinit var dbHelper: DBHelper
     private lateinit var rvMini: RecyclerView
+    lateinit var historialAdapter: HistorialAdapter
+    private lateinit var rvResultados: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,13 +51,26 @@ class MenuInicial : AppCompatActivity() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ listaTop ->
                 // Usamos el adapter pasándole 'true' para que no salgan las monedas
-                val adapter = HistorialAdapter(listaTop, true)
-                rvMini.adapter = adapter
+                historialAdapter = HistorialAdapter(listaTop, true)
+                rvMini.adapter = historialAdapter
             }, { error ->
                 Log.e("ErrorDB", "No cargó el Top: ${error.message}")
             })
 
         viewModel.iniBaseDatos(this) // Para conectar la base de datos con la vista
+
+        rvResultados = findViewById(R.id.rvResultadosBusqueda)
+        rvResultados.layoutManager = LinearLayoutManager(this)
+
+        // Cargamos TODAS las partidas para que el buscador tenga de dónde sacar
+        dbHelper.obtenerHistorialAsync() // Asumiendo que tienes este método
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ listaCompleta ->
+                historialAdapter = HistorialAdapter(listaCompleta, false) // false para ver monedas
+                rvResultados.adapter = historialAdapter
+            }, { /* error */ })
+
+
 
         btnJugar = findViewById(R.id.btnJugar)
         btnHistorial = findViewById(R.id.btnHistorial)
@@ -61,7 +79,7 @@ class MenuInicial : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        Toast.makeText(this, "Bienvenido $nombreJugador", Toast.LENGTH_LONG).show()
+        mostrarSaludoBienvenida(nombreJugador)
 
         btnJugar.setOnClickListener {
             val ticket = Intent(this, JuegoView::class.java)
@@ -77,35 +95,93 @@ class MenuInicial : AppCompatActivity() {
         btnConfiguracion.setOnClickListener {}
 
     }
+    //Para quitar ajutes del toolbar en esta pagina
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        // 1. Buscamos los items por su ID
+        val itemCasita = menu?.findItem(R.id.casita)
+        val itemConfig = menu?.findItem(R.id.item_configuracion)
+
+        // 2. Los hacemos invisibles
+        itemCasita?.isVisible = false
+        itemConfig?.isVisible = false
+
+        return super.onPrepareOptionsMenu(menu)
+    }
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_navegacion, menu)
+        val searchItem = menu?.findItem(R.id.action_search)
+        val searchView = searchItem?.actionView as androidx.appcompat.widget.SearchView
+
+        searchView.queryHint = "Buscar partida..."
+
+        // Personalización de colores (para que no falle, usamos un try-catch o safe call)
+        val searchText = searchView.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)
+        searchText?.setTextColor(Color.BLACK)
+        searchText?.setHintTextColor(Color.GRAY)
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                // 1. Verificamos que el adapter esté inicializado para evitar crasheos
+                if (::historialAdapter.isInitialized) {
+
+                    if (newText.isNullOrEmpty()) {
+                        // 2. Si no hay texto, escondemos el listado de búsqueda y vemos el menú normal
+                        rvResultados.visibility = android.view.View.GONE
+                    } else {
+                        // 3. Si el usuario escribe, mostramos el listado de resultados encima de TODO
+                        rvResultados.visibility = android.view.View.VISIBLE
+
+                        // 4. Ejecutamos el filtrado con el texto que escribió el usuario
+                        historialAdapter.filtrar(newText)
+                    }
+                }
+                return true
+            }
+        })
+
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
 
-            android.R.id.home -> {
-                finish() // Simplemente cierra esta pantalla y vuelve a la anterior
-                true
-            }
             R.id.item_cerrar_sesion -> {
+                val intent = Intent(this, Login::class.java)
+
+                // 2. Limpiamos el historial de pantallas para que no pueda volver al juego
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+                startActivity(intent)
+
+                // 3. Cerramos esta pantalla
                 finish()
                 true
             }
+            R.id.action_ayuda_inicio -> {
+                val intent = Intent(this, Ayuda::class.java)
+                startActivity(intent)
+                return true
+                }
             else -> super.onOptionsItemSelected(item) //Aqui debo poner para ir a la pagina de login
         }
     }
-    private fun cargarMiniHistorial() {
-        // Traemos solo las últimas 3 partidas
-        dbHelper.obtenerHistorialTOP()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ lista ->
-                // REUTILIZAMOS el mismo adaptador que ya creamos. ¡No hace falta crear otro!
-                val adapter = HistorialAdapter(lista)
-                rvMini.adapter = adapter
-            }, { error ->
-                Log.e("MiniHistorial", "Error: ${error.message}")
-            })
+    private fun mostrarSaludoBienvenida(nombre: String) {
+        val builder = android.app.AlertDialog.Builder(this)
+        builder.setTitle("¡Hola!")
+        builder.setMessage("Bienvenid@, $nombre. Prepárate para el desafío.")
+
+        val dialog = builder.create()
+        dialog.show()
+
+        // PROGRAMAMOS EL CIERRE AUTOMÁTICO (a los 2.5 segundos)
+        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+            if (dialog.isShowing) {
+                dialog.dismiss()
+            }
+        }, 4000)
     }
 }

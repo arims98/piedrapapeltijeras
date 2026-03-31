@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.primeropiedra.Model.PartidaTabla
 import com.example.primeropiedra.R
 
-class HistorialAdapter(private val lista: List<PartidaTabla>,
+class HistorialAdapter(val lista: List<PartidaTabla>,
     private val esTOP: Boolean = false) :
     RecyclerView.Adapter<HistorialAdapter.CajasHistorial>() {
 
@@ -22,6 +22,7 @@ class HistorialAdapter(private val lista: List<PartidaTabla>,
         val tvMarcadorFinal: TextView = view.findViewById(R.id.tvMarcadorFinal)
         val viewColor: View = view.findViewById(R.id.viewResultadoColor)
     }
+    var listaFiltrada: MutableList<PartidaTabla> = lista.toMutableList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CajasHistorial {
         val vistaPuesta = LayoutInflater.from(parent.context)
@@ -30,10 +31,10 @@ class HistorialAdapter(private val lista: List<PartidaTabla>,
     }
 
     override fun onBindViewHolder(holder: CajasHistorial, position: Int) {
-        val partidaActual = lista[position]
+        val partidaActual = listaFiltrada[position]
 
         // Asignamos los datos
-        holder.tvNombre.text = partidaActual.nombre.uppercase()
+        holder.tvNombre.text = partidaActual.nombre
         holder.tvFechaPartida.text = partidaActual.fecha
         holder.tvDuracion.text = "Tiempo: ${partidaActual.duracion}s"
         holder.tvMonedasTotal.text = "${partidaActual.monedas}"
@@ -62,5 +63,20 @@ class HistorialAdapter(private val lista: List<PartidaTabla>,
         }
     }
 
-    override fun getItemCount(): Int = lista.size
+    override fun getItemCount(): Int = listaFiltrada.size
+
+    fun filtrar(texto: String) {
+        listaFiltrada.clear()
+        if (texto.isEmpty()) {
+            listaFiltrada.addAll(lista)
+        } else {
+            val busqueda = texto.lowercase()
+            for (partida in lista) {
+                if (partida.nombre.lowercase().contains(busqueda)) {
+                    listaFiltrada.add(partida)
+                }
+            }
+        }
+        notifyDataSetChanged() // Refresca la lista en pantalla
+    }
 }
