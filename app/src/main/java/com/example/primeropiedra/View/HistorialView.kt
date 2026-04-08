@@ -142,6 +142,11 @@ class HistorialView : AppCompatActivity() {
                 finish()
                 true
             }
+            R.id.action_ayuda_inicio -> {
+                val intent = Intent(this, Ayuda::class.java)
+                startActivity(intent)
+                return true
+            }
             else -> super.onOptionsItemSelected(item) //Aqui debo poner para ir a la pagina de login
         }
     }

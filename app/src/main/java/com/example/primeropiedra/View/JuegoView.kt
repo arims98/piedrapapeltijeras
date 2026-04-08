@@ -23,15 +23,20 @@ import android.app.AlertDialog // Para los carteles de victoria/derrota profesio
 import android.graphics.Color
 import android.util.Log
 import android.widget.EditText
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.primeropiedra.Model.DBHelper
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import androidx.recyclerview.widget.LinearLayoutManager
+import android.webkit.WebView
+import android.webkit.WebViewClient
+
+
 
 class JuegoView : AppCompatActivity() {
-    private val viewModel: JuegoViewModel by viewModels()
     var nombreJugador: String = ""
+    private val viewModel: JuegoViewModel by viewModels()
     lateinit var btnPiedra: ImageView
     lateinit var btnPapel: ImageView
     lateinit var btnTijeras: ImageView
@@ -158,11 +163,11 @@ class JuegoView : AppCompatActivity() {
 
         if (victoria) {
             builder.setTitle("🏆 ¡VICTORIA!")
-            builder.setMessage("¡Enhorabuena! Has ganado por $puntosJugador a $puntosIA.\n¿Qué quieres hacer ahora?")
+            builder.setMessage("¡Enhorabuena! Has ganado por $puntosJugador a $puntosIA.\n +5 monedas\n¿Qué quieres hacer ahora?")
             builder.setIcon(android.R.drawable.btn_star_big_on)
         } else {
             builder.setTitle("😢 DERROTA")
-            builder.setMessage("Vaya... la IA te ha ganado $puntosIA a $puntosJugador.\n¡Sigue practicando para el TOP 3!")
+            builder.setMessage("Vaya... la IA te ha ganado $puntosIA a $puntosJugador.\n -2 monedas \n¡Sigue practicando para el TOP 3!")
             builder.setIcon(android.R.drawable.ic_delete)
         }
 
@@ -245,10 +250,6 @@ class JuegoView : AppCompatActivity() {
                 finish()
                 true
             }
-            R.id.action_ayuda_inicio -> {
-                mostrarPopUpAyuda()
-                true
-            }
             R.id.item_cerrar_sesion -> {
                 val intent = Intent(this, Login::class.java)
 
@@ -261,18 +262,14 @@ class JuegoView : AppCompatActivity() {
                 finish()
                 true
             }
-            else -> super.onOptionsItemSelected(item)
+            R.id.action_ayuda_inicio -> {
+                val intent = Intent(this, Ayuda::class.java)
+                startActivity(intent)
+                return true
+            }
+            else -> super.onOptionsItemSelected(item) //Aqui debo poner para ir a la pagina de login
         }
     }
-
-    private fun mostrarPopUpAyuda() {
-        AlertDialog.Builder(this)
-            .setTitle("Reglas del Juego")
-            .setMessage("• Piedra > Tijera\n• Papel > Piedra\n• Tijera > Papel\n\n¡Gana el primero que llegue a 5 puntos!")
-            .setPositiveButton("Entendido", null)
-            .show()
-    }
-
     private fun observamosDatos() {
         viewModel.Marcador.observe(this) { nuevoMarcador ->
             marcador.text = nuevoMarcador
@@ -329,4 +326,5 @@ class JuegoView : AppCompatActivity() {
             }
         }, 4000)
     }
+
 }

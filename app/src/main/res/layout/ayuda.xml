@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="#E91E63"
-        app:title="GUÍA DE SUPERVIVENCIA"
+        app:title="AYUDA"
         app:titleTextColor="#FFFFFF" />
 
     <WebView
