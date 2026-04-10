@@ -25,6 +25,9 @@ import com.example.primeropiedra.Model.DBHelper
 import com.example.primeropiedra.Services.MusicaService
 import android.os.Handler
 import android.media.AudioAttributes
+import android.content.Context
+import android.media.AudioManager
+
 
 class Configuracion : AppCompatActivity() {
     lateinit var historialAdapter: HistorialAdapter
@@ -37,6 +40,9 @@ class Configuracion : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.configuracion)
+
+        val prefs = getSharedPreferences("AjustesApp", MODE_PRIVATE)
+        musicaEncendida = prefs.getBoolean("musica_viva", true)
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -67,6 +73,12 @@ class Configuracion : AppCompatActivity() {
         sonidoClicId = soundPool.load(this, R.raw.clickmusica, 1)
 
         btnMusica = findViewById(R.id.btnMusica)
+
+        if (musicaEncendida) {
+            btnMusica.setImageResource(R.drawable.music)
+        } else {
+            btnMusica.setImageResource(R.drawable.nomusic)
+        }
 
         btnMusica.setOnClickListener {
             // 1. Preparamos las preferencias
@@ -184,6 +196,24 @@ class Configuracion : AppCompatActivity() {
         super.onDestroy()
         if (::soundPool.isInitialized) {
             soundPool.release() // Esto libera la memoria RAM (Punto 1.c)
+        }
+    }
+    override fun onResume() {
+        super.onResume()
+
+        val prefs = getSharedPreferences("AjustesApp", MODE_PRIVATE)
+        val musicaActivada = prefs.getBoolean("musica_viva", true)
+
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+        // Preguntamos: ¿Hay música de otra app (Spotify/YouTube) sonando ahora mismo?
+        val otraAppSonando = audioManager.isMusicActive
+
+        if (musicaActivada && !otraAppSonando) {
+            // Solo si el usuario quiere música Y Spotify está callado, reanudamos
+            val intent = Intent(this, MusicaService::class.java)
+            intent.action = "REANUDAR_AUDIO"
+            startService(intent)
         }
     }
 }

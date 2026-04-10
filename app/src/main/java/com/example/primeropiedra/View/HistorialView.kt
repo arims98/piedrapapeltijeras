@@ -1,7 +1,9 @@
 package com.example.primeropiedra.View
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.media.AudioManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -27,6 +29,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import android.util.Log
 import android.widget.EditText
 import androidx.appcompat.widget.SearchView
+import com.example.primeropiedra.Services.MusicaService
 
 class HistorialView : AppCompatActivity() {
 
@@ -153,6 +156,24 @@ class HistorialView : AppCompatActivity() {
                 return true
             }
             else -> super.onOptionsItemSelected(item) //Aqui debo poner para ir a la pagina de login
+        }
+    }
+    override fun onResume() {
+        super.onResume()
+
+        val prefs = getSharedPreferences("AjustesApp", MODE_PRIVATE)
+        val musicaActivada = prefs.getBoolean("musica_viva", true)
+
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+        // Preguntamos: ¿Hay música de otra app (Spotify/YouTube) sonando ahora mismo?
+        val otraAppSonando = audioManager.isMusicActive
+
+        if (musicaActivada && !otraAppSonando) {
+            // Solo si el usuario quiere música Y Spotify está callado, reanudamos
+            val intent = Intent(this, MusicaService::class.java)
+            intent.action = "REANUDAR_AUDIO"
+            startService(intent)
         }
     }
 }

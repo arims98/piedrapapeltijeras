@@ -19,7 +19,7 @@ import com.example.primeropiedra.ViewModel.JuegoViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import android.app.AlertDialog // Para los carteles de victoria/derrota profesionales
+import android.app.AlertDialog
 import android.graphics.Color
 import android.media.AudioAttributes
 import android.media.SoundPool
@@ -33,7 +33,9 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import androidx.recyclerview.widget.LinearLayoutManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
-
+import com.example.primeropiedra.Services.MusicaService
+import android.content.Context
+import android.media.AudioManager
 
 
 
@@ -378,6 +380,24 @@ class JuegoView : AppCompatActivity() {
         }
         if (sonidoSeleccionado != 0) {
             soundPool.play(sonidoSeleccionado, 1f, 1f, 1, 0, 1f)
+        }
+    }
+    override fun onResume() {
+        super.onResume()
+
+        val prefs = getSharedPreferences("AjustesApp", MODE_PRIVATE)
+        val musicaActivada = prefs.getBoolean("musica_viva", true)
+
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+        // Preguntamos: ¿Hay música de otra app (Spotify/YouTube) sonando ahora mismo?
+        val otraAppSonando = audioManager.isMusicActive
+
+        if (musicaActivada && !otraAppSonando) {
+            // Solo si el usuario quiere música Y Spotify está callado, reanudamos
+            val intent = Intent(this, MusicaService::class.java)
+            intent.action = "REANUDAR_AUDIO"
+            startService(intent)
         }
     }
 

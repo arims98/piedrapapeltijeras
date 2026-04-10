@@ -14,7 +14,8 @@
         <service
             android:name=".Services.MusicaService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback"></service>
 
         <activity
             android:name=".View.PantallaCarga"
@@ -44,5 +45,8 @@
             android:name=".View.Configuracion"
             android:exported="false" />
     </application>
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
 </manifest>
