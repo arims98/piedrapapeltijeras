@@ -2,12 +2,16 @@ package com.example.primeropiedra.View
 
 import android.content.Intent
 import android.graphics.Color
+import android.media.SoundPool
 import android.os.Bundle
+import android.os.Looper
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -18,93 +22,98 @@ import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.primeropiedra.Model.DBHelper
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import com.example.primeropiedra.Services.MusicaService
+import android.os.Handler
+import android.media.AudioAttributes
 
-class MenuInicial : AppCompatActivity() {
-
-    private val viewModel: JuegoViewModel by viewModels()
-
-    var nombreJugador: String = "" // Aqui guardamos el nombre del jugador
-    lateinit var btnJugar: Button
-    lateinit var btnHistorial: Button
-    lateinit var btnConfiguracion: Button
-    private lateinit var dbHelper: DBHelper
-    private lateinit var rvMini: RecyclerView
+class Configuracion : AppCompatActivity() {
     lateinit var historialAdapter: HistorialAdapter
     private lateinit var rvResultados: RecyclerView
+    var musicaEncendida = true
+    lateinit var btnMusica: ImageButton
+    private lateinit var soundPool: SoundPool //Para reproducir sonidos rápidos y que no sea lento
+    private var sonidoClicId: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.menu)
-
-        dbHelper = DBHelper(this)
-
-        // Capturamos el nombre y lo guardamos en nuestra variable global
-        val nombreJugador = intent.getStringExtra("NOMBRE_JUGADOR") ?: "Jugador"
-
-        // 2. Configuramos el mini recycler
-        rvMini = findViewById(R.id.rvMiniHistorial)
-        rvMini.layoutManager = LinearLayoutManager(this)
-
-        dbHelper.obtenerHistorialTOP() // <--- Esta es la que SÍ tienes en el DBHelper
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ listaTop ->
-                // Usamos el adapter pasándole 'true' para que no salgan las monedas
-                historialAdapter = HistorialAdapter(listaTop, true)
-                rvMini.adapter = historialAdapter
-            }, { error ->
-                Log.e("ErrorDB", "No cargó el Top: ${error.message}")
-            })
-
-        viewModel.iniBaseDatos(this) // Para conectar la base de datos con la vista
-
-        rvResultados = findViewById(R.id.rvResultadosBusqueda)
-        rvResultados.layoutManager = LinearLayoutManager(this)
-
-        // Cargamos TODAS las partidas para que el buscador tenga de dónde sacar
-        dbHelper.obtenerHistorialAsync() // Asumiendo que tienes este método
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ listaCompleta ->
-                historialAdapter = HistorialAdapter(listaCompleta, false) // false para ver monedas
-                rvResultados.adapter = historialAdapter
-            }, { /* error */ })
-
-        btnJugar = findViewById(R.id.btnJugar)
-        btnHistorial = findViewById(R.id.btnHistorial)
-        btnConfiguracion = findViewById(R.id.btnConfiguracion)
+        setContentView(R.layout.configuracion)
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        mostrarSaludoBienvenida(nombreJugador)
+        // 1. Cargamos las animaciones
+        val fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in)
+        val fadeOut = AnimationUtils.loadAnimation(this, R.anim.fade_out)
 
-        btnJugar.setOnClickListener {
-            val ticket = Intent(this, JuegoView::class.java)
-            ticket.putExtra("nombreUsuario", nombreJugador)
-            startActivity(ticket)
-        }
-        btnHistorial.setOnClickListener {
-            val intent = Intent(this, HistorialView::class.java)
-            startActivity(intent)
-        }
-        btnConfiguracion.setOnClickListener {
-            val intent = Intent(this, Configuracion::class.java)
-            startActivity(intent)
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_GAME)
+            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+            .build()
+
+        soundPool = SoundPool.Builder()
+            .setMaxStreams(5) // Permite sonar 5 sonidos a la vez sin cortarse
+            .setAudioAttributes(audioAttributes)
+            .build()
+
+        soundPool.setOnLoadCompleteListener { _, sampleId, status ->
+            if (status == 0) {
+                Log.d("SoundPool", "Sonido cargado con éxito, ID: $sampleId")
+            } else {
+                Log.e("SoundPool", "Error al cargar el sonido")
+            }
         }
 
+// Cargamos el sonido
+        sonidoClicId = soundPool.load(this, R.raw.clickmusica, 1)
+
+        btnMusica = findViewById(R.id.btnMusica)
+
+        btnMusica.setOnClickListener {
+            // 1. Preparamos las preferencias
+            val prefs = getSharedPreferences("AjustesApp", MODE_PRIVATE)
+            val editor = prefs.edit()
+
+            // 2. Lanzamos la animación de desaparecer
+            btnMusica.startAnimation(fadeOut)
+
+            // 3. Esperamos a que la imagen sea invisible para cambiarla
+            Handler(Looper.getMainLooper()).postDelayed({
+                if (musicaEncendida) {
+                    // --- MÚSICA SE APAGA ---
+                    btnMusica.setImageResource(R.drawable.nomusic)
+                    stopService(Intent(this@Configuracion, MusicaService::class.java))
+
+                    musicaEncendida = false
+                    editor.putBoolean("musica_viva", false) // Guardamos que está APAGADA
+                } else {
+                    // --- MÚSICA SE ENCIENDE ---
+                    btnMusica.setImageResource(R.drawable.music)
+                    startService(Intent(this@Configuracion, MusicaService::class.java))
+
+                    musicaEncendida = true
+                    editor.putBoolean("musica_viva", true) // Guardamos que está ENCENDIDA
+                }
+
+                //Confirmamos el guardado en la memoria del móvil
+                editor.apply()
+
+                // 5. Animación de aparecer y sonido
+                btnMusica.startAnimation(fadeIn)
+                soundPool.play(sonidoClicId, 1f, 1f, 1, 0, 1f)
+
+            }, 300)
+        }
     }
     //Para quitar ajutes del toolbar en esta pagina
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         // 1. Buscamos los items por su ID
-        val itemCasita = menu?.findItem(R.id.casita)
         val itemConfig = menu?.findItem(R.id.item_configuracion)
-
         // 2. Los hacemos invisibles
-        itemCasita?.isVisible = false
         itemConfig?.isVisible = false
 
         return super.onPrepareOptionsMenu(menu)
     }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_navegacion, menu)
         val searchItem = menu?.findItem(R.id.action_search)
@@ -146,7 +155,10 @@ class MenuInicial : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-
+            R.id.casita -> {
+                finish()
+                true
+            }
             R.id.item_cerrar_sesion -> {
                 val intent = Intent(this, Login::class.java)
 
@@ -163,23 +175,16 @@ class MenuInicial : AppCompatActivity() {
                 val intent = Intent(this, Ayuda::class.java)
                 startActivity(intent)
                 return true
-                }
+            }
             else -> super.onOptionsItemSelected(item) //Aqui debo poner para ir a la pagina de login
         }
     }
-    private fun mostrarSaludoBienvenida(nombre: String) {
-        val builder = android.app.AlertDialog.Builder(this)
-        builder.setTitle("¡Hola!")
-        builder.setMessage("Bienvenid@, $nombre. Prepárate para el desafío.")
-
-        val dialog = builder.create()
-        dialog.show()
-
-        // PROGRAMAMOS EL CIERRE AUTOMÁTICO (a los 2.5 segundos)
-        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-            if (dialog.isShowing) {
-                dialog.dismiss()
-            }
-        }, 4000)
+    //Para que el sonido del boton de la musica, no se vaya guardando en la RAM
+    override fun onDestroy() {
+        super.onDestroy()
+        if (::soundPool.isInitialized) {
+            soundPool.release() // Esto libera la memoria RAM (Punto 1.c)
+        }
     }
 }
+

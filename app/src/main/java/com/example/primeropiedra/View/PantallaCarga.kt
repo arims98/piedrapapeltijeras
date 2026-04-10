@@ -6,13 +6,17 @@ import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import com.example.primeropiedra.R
+import com.example.primeropiedra.Services.MusicaService
 
 class PantallaCarga: AppCompatActivity() {
+    var musicaEncendida = true
     override fun onCreate(savedInstanceState: Bundle?) {
         super .onCreate(savedInstanceState)
         //Aqui esta el diseño
         setContentView(R.layout.activity_pantalla_carga)
 
+        startService(Intent(this, MusicaService::class.java))
+        musicaEncendida = true
 
         //Temporizar de 3 segundos para saltar al login
         Handler(Looper.getMainLooper()).postDelayed({

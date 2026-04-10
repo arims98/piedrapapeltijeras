@@ -130,6 +130,11 @@ class HistorialView : AppCompatActivity() {
                 finish()
                 true
             }
+            R.id.item_configuracion -> {
+                val intent = Intent(this, Configuracion::class.java)
+                startActivity(intent)
+                return true
+            }
             R.id.item_cerrar_sesion -> {
                 val intent = Intent(this, Login::class.java)
 

@@ -21,6 +21,8 @@ import java.util.Date
 import java.util.Locale
 import android.app.AlertDialog // Para los carteles de victoria/derrota profesionales
 import android.graphics.Color
+import android.media.AudioAttributes
+import android.media.SoundPool
 import android.util.Log
 import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
@@ -31,6 +33,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import androidx.recyclerview.widget.LinearLayoutManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
+
 
 
 
@@ -51,6 +54,10 @@ class JuegoView : AppCompatActivity() {
     lateinit var historialAdapter: HistorialAdapter
     private lateinit var rvResultados: RecyclerView
     private lateinit var dbHelper: DBHelper
+    private lateinit var soundPool: SoundPool //Para reproducir sonidos rápidos y que no sea lento
+    private var sonidopiedraId: Int = 0
+    private var sonidopapelId: Int = 0
+    private var sonidotijerasId: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,6 +104,29 @@ class JuegoView : AppCompatActivity() {
                 Log.e("ErrorDB", "No se pudieron cargar los datos para el buscador: ${error.message}")
             })
 
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_GAME)
+            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+            .build()
+
+        soundPool = SoundPool.Builder()
+            .setMaxStreams(10) // Permite sonar 10 sonidos a la vez sin cortarse
+            .setAudioAttributes(audioAttributes)
+            .build()
+
+        soundPool.setOnLoadCompleteListener { _, sampleId, status ->
+            if (status == 0) {
+                Log.d("SoundPool", "Sonido cargado con éxito, ID: $sampleId")
+            } else {
+                Log.e("SoundPool", "Error al cargar el sonido")
+            }
+        }
+
+// Cargamos los sonidos
+        sonidopiedraId = soundPool.load(this, R.raw.stone, 1)
+        sonidopapelId = soundPool.load(this, R.raw.paper, 1)
+        sonidotijerasId = soundPool.load(this, R.raw.tijeras, 1)
+
         btnStart.setOnClickListener {
             activamosManos()
             viewModel.iniciarPartida()
@@ -106,9 +136,15 @@ class JuegoView : AppCompatActivity() {
             Toast.makeText(this, "¡Partida iniciada!", Toast.LENGTH_SHORT).show()
         }
 
-        btnPiedra.setOnClickListener { jugar(1) }
-        btnPapel.setOnClickListener { jugar(2) }
-        btnTijeras.setOnClickListener { jugar(3) }
+        btnPiedra.setOnClickListener {
+            sonarMano("piedra")
+            jugar (1)}
+        btnPapel.setOnClickListener {
+            jugar(2)
+            sonarMano("papel")}
+        btnTijeras.setOnClickListener {
+            jugar(3)
+            sonarMano("tijeras")}
 
         viewModel.mensajeEstado.observe(this) { mensaje ->
             Mensajes.text = mensaje
@@ -156,8 +192,6 @@ class JuegoView : AppCompatActivity() {
             puntosIA = viewModel.victoriasIA.value ?: 0
         )
     }
-
-    // --- NUEVA FUNCIÓN PARA EL CARTEL PROFESIONAL ---
     private fun mostrarCartelFinal(victoria: Boolean, puntosJugador: Int, puntosIA: Int) {
         val builder = AlertDialog.Builder(this)
 
@@ -262,10 +296,16 @@ class JuegoView : AppCompatActivity() {
                 finish()
                 true
             }
+            R.id.item_configuracion -> {
+                val intent = Intent(this, Configuracion::class.java)
+                startActivity(intent)
+                return true
+            }
             R.id.action_ayuda_inicio -> {
                 val intent = Intent(this, Ayuda::class.java)
                 startActivity(intent)
                 return true
+
             }
             else -> super.onOptionsItemSelected(item) //Aqui debo poner para ir a la pagina de login
         }
@@ -280,9 +320,12 @@ class JuegoView : AppCompatActivity() {
         viewModel.eleccionIA.observe(this) { eleccionIA ->
             manoPC.visibility = View.VISIBLE
             when (eleccionIA) {
-                1 -> manoPC.setImageResource(R.drawable.descargapiedra)
-                2 -> manoPC.setImageResource(R.drawable.descargapapel)
-                3 -> manoPC.setImageResource(R.drawable.descargatijeras)
+                1 -> { manoPC.setImageResource(R.drawable.descargapiedra)
+                sonarMano("piedra")}
+                2 -> {manoPC.setImageResource(R.drawable.descargapapel)
+                sonarMano("papel")}
+                3 -> {manoPC.setImageResource(R.drawable.descargatijeras)
+                sonarMano("tijeras")}
             }
         }
     }
@@ -325,6 +368,17 @@ class JuegoView : AppCompatActivity() {
                 dialog.dismiss()
             }
         }, 4000)
+    }
+    private fun sonarMano(tipo: String) {
+        val sonidoSeleccionado = when (tipo.lowercase()) {
+            "piedra" -> sonidopiedraId
+            "papel" -> sonidopapelId
+            "tijeras" -> sonidotijerasId
+            else -> 0
+        }
+        if (sonidoSeleccionado != 0) {
+            soundPool.play(sonidoSeleccionado, 1f, 1f, 1, 0, 1f)
+        }
     }
 
 }
