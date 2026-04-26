@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="#E91E63"
-            app:title="HISTORIAL"
+            app:title="@string/text_historial"
             app:titleTextColor="#FFFFFF"
             android:elevation="4dp" />
 
@@ -41,7 +41,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="15dp"
-                android:text="Últimas batallas"
+                android:text="@string/text_batallas"
                 android:textColor="#FFFFFF"
                 android:textSize="28sp"
                 android:textStyle="bold"

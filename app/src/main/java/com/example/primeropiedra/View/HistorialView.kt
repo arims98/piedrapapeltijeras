@@ -13,7 +13,6 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -129,9 +128,9 @@ class HistorialView : AppCompatActivity() {
                 true
             }
             R.id.casita -> {
-                // El icono de la casa te devuelve al Menú Principal (Login)
-                finish()
-                true
+                val intent = Intent(this, MenuInicial::class.java)
+                startActivity(intent)
+                return true
             }
             R.id.item_configuracion -> {
                 val intent = Intent(this, Configuracion::class.java)
@@ -158,22 +157,5 @@ class HistorialView : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item) //Aqui debo poner para ir a la pagina de login
         }
     }
-    override fun onResume() {
-        super.onResume()
 
-        val prefs = getSharedPreferences("AjustesApp", MODE_PRIVATE)
-        val musicaActivada = prefs.getBoolean("musica_viva", true)
-
-        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-
-        // Preguntamos: ¿Hay música de otra app (Spotify/YouTube) sonando ahora mismo?
-        val otraAppSonando = audioManager.isMusicActive
-
-        if (musicaActivada && !otraAppSonando) {
-            // Solo si el usuario quiere música Y Spotify está callado, reanudamos
-            val intent = Intent(this, MusicaService::class.java)
-            intent.action = "REANUDAR_AUDIO"
-            startService(intent)
-        }
-    }
 }

@@ -27,6 +27,7 @@ import android.os.Handler
 import android.media.AudioAttributes
 import android.content.Context
 import android.media.AudioManager
+import com.example.primeropiedra.Utils.Idioma
 
 
 class Configuracion : AppCompatActivity() {
@@ -36,6 +37,8 @@ class Configuracion : AppCompatActivity() {
     lateinit var btnMusica: ImageButton
     private lateinit var soundPool: SoundPool //Para reproducir sonidos rápidos y que no sea lento
     private var sonidoClicId: Int = 0
+    lateinit var btnIdioma: Button
+    lateinit var btnAnimaciones: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,10 +49,6 @@ class Configuracion : AppCompatActivity() {
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
-
-        // 1. Cargamos las animaciones
-        val fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in)
-        val fadeOut = AnimationUtils.loadAnimation(this, R.anim.fade_out)
 
         val audioAttributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_GAME)
@@ -74,47 +73,55 @@ class Configuracion : AppCompatActivity() {
 
         btnMusica = findViewById(R.id.btnMusica)
 
-        if (musicaEncendida) {
-            btnMusica.setImageResource(R.drawable.music)
-        } else {
-            btnMusica.setImageResource(R.drawable.nomusic)
-        }
+        // --- CONFIGURACIÓN DE ANIMACIONES Y SOUNDPOOL ---
+        val fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in)
+        val fadeOut = AnimationUtils.loadAnimation(this, R.anim.fade_out)
+        // ... (Tu código de AudioAttributes y SoundPool aquí) ...
 
+        // --- LÓGICA DEL BOTÓN DE MÚSICA ---
         btnMusica.setOnClickListener {
-            // 1. Preparamos las preferencias
-            val prefs = getSharedPreferences("AjustesApp", MODE_PRIVATE)
             val editor = prefs.edit()
-
-            // 2. Lanzamos la animación de desaparecer
             btnMusica.startAnimation(fadeOut)
 
-            // 3. Esperamos a que la imagen sea invisible para cambiarla
             Handler(Looper.getMainLooper()).postDelayed({
+                val intentService = Intent(this, MusicaService::class.java) // CAMBIO: Siempre usaremos este intent
+
                 if (musicaEncendida) {
                     // --- MÚSICA SE APAGA ---
                     btnMusica.setImageResource(R.drawable.nomusic)
-                    stopService(Intent(this@Configuracion, MusicaService::class.java))
+
+                    intentService.action = "PAUSAR_AUDIO"
+                    startService(intentService)
 
                     musicaEncendida = false
-                    editor.putBoolean("musica_viva", false) // Guardamos que está APAGADA
+                    editor.putBoolean("musica_viva", false)
                 } else {
                     // --- MÚSICA SE ENCIENDE ---
                     btnMusica.setImageResource(R.drawable.music)
-                    startService(Intent(this@Configuracion, MusicaService::class.java))
+
+                    intentService.action = "REANUDAR_AUDIO"
+                    startService(intentService)
 
                     musicaEncendida = true
-                    editor.putBoolean("musica_viva", true) // Guardamos que está ENCENDIDA
+                    editor.putBoolean("musica_viva", true)
                 }
 
-                //Confirmamos el guardado en la memoria del móvil
                 editor.apply()
-
-                // 5. Animación de aparecer y sonido
                 btnMusica.startAnimation(fadeIn)
                 soundPool.play(sonidoClicId, 1f, 1f, 1, 0, 1f)
-
             }, 300)
         }
+
+        btnIdioma = findViewById(R.id.btnIdioma)
+
+        btnIdioma.setOnClickListener {
+            val intent = Intent(this, IdiomasActivity::class.java)
+            startActivity(intent)
+        }
+        btnAnimaciones = findViewById(R.id.btnAnimaciones)
+
+        btnAnimaciones.setOnClickListener { }
+
     }
     //Para quitar ajutes del toolbar en esta pagina
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
@@ -198,23 +205,6 @@ class Configuracion : AppCompatActivity() {
             soundPool.release() // Esto libera la memoria RAM (Punto 1.c)
         }
     }
-    override fun onResume() {
-        super.onResume()
 
-        val prefs = getSharedPreferences("AjustesApp", MODE_PRIVATE)
-        val musicaActivada = prefs.getBoolean("musica_viva", true)
-
-        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-
-        // Preguntamos: ¿Hay música de otra app (Spotify/YouTube) sonando ahora mismo?
-        val otraAppSonando = audioManager.isMusicActive
-
-        if (musicaActivada && !otraAppSonando) {
-            // Solo si el usuario quiere música Y Spotify está callado, reanudamos
-            val intent = Intent(this, MusicaService::class.java)
-            intent.action = "REANUDAR_AUDIO"
-            startService(intent)
-        }
-    }
 }
 

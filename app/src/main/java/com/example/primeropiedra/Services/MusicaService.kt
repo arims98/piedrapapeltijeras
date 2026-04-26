@@ -31,10 +31,15 @@ class MusicaService : Service() {
 
             // RECUPERAR EL SONIDO (Spotify se para)
             AudioManager.AUDIOFOCUS_GAIN -> {
-                // Subimos volumen y arrancamos. NO vuelvas a llamar a solicitarEnfoqueAudio() aquí.
-                mediaPlayer.setVolume(0.5f, 0.5f)
-                if (!mediaPlayer.isPlaying) {
-                    mediaPlayer.start()
+                //Leemos preferencias para saber si el usuario quiere musica
+                val prefs = getSharedPreferences("AjustesApp", Context.MODE_PRIVATE)
+                val musicaActivada = prefs.getBoolean("musica_viva", true)
+                // Subimos volumen y arrancamos.
+                if (musicaActivada) { // Solo si está activada en el botón
+                    mediaPlayer.setVolume(0.5f, 0.5f)
+                    if (!mediaPlayer.isPlaying) {
+                        mediaPlayer.start()
+                    }
                 }
             }
 
@@ -56,22 +61,31 @@ class MusicaService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         iniciarNotificacionPersistente()
 
-        // Si recibimos la orden de reanudar desde una Activity
-        if (intent?.action == "REANUDAR_AUDIO") {
-            if (!mediaPlayer.isPlaying) {
-                if (solicitarEnfoqueAudio()) {
+        when (intent?.action) {
+            "REANUDAR_AUDIO" -> {
+                val prefs = getSharedPreferences("AjustesApp", Context.MODE_PRIVATE)
+                val musicaActivada = prefs.getBoolean("musica_viva", true)
+                if (musicaActivada && !mediaPlayer.isPlaying && solicitarEnfoqueAudio()) {
                     mediaPlayer.start()
                 }
             }
-        } else {
-            // Inicio normal del servicio
-            if (solicitarEnfoqueAudio()) {
-                if (!mediaPlayer.isPlaying) {
-                    mediaPlayer.start()
+            "PAUSAR_AUDIO" -> {
+                // 2. Si recibimos la orden de pausa desde el onPause de la Activity
+                if (mediaPlayer.isPlaying) {
+                    mediaPlayer.pause()
+                }
+            }
+            else -> {
+                /// ESTO ES LO QUE SE EJECUTA AL ABRIR LA APP
+                // Si el usuario no la ha apagado antes, arrancamos siempre
+                val musicaActivada = false
+                if (musicaActivada) {
+                    if (solicitarEnfoqueAudio()) {
+                        mediaPlayer.start()
+                    }
                 }
             }
         }
-
         return START_STICKY
     }
     //Esta función devuelve un true si android nos deja sonar, false si no

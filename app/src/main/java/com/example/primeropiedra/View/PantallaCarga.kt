@@ -35,22 +35,5 @@ class PantallaCarga: AppCompatActivity() {
 
         }, 3000)
     }
-    override fun onResume() {
-        super.onResume()
 
-        val prefs = getSharedPreferences("AjustesApp", MODE_PRIVATE)
-        val musicaActivada = prefs.getBoolean("musica_viva", true)
-
-        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-
-        // Preguntamos: ¿Hay música de otra app (Spotify/YouTube) sonando ahora mismo?
-        val otraAppSonando = audioManager.isMusicActive
-
-        if (musicaActivada && !otraAppSonando) {
-            // Solo si el usuario quiere música Y Spotify está callado, reanudamos
-            val intent = Intent(this, MusicaService::class.java)
-            intent.action = "REANUDAR_AUDIO"
-            startService(intent)
-        }
-    }
 }

@@ -1,3 +1,76 @@
 <resources>
-    <string name="app_name">¡Primero, Piedra!</string>
+    <string name="text_ayuda">AYUDA</string>
+    <string name="text_musica">Música</string>
+    <string name="text_idioma">IDIOMA</string>
+    <string name="text_confi">CONFIGURACIÓN</string>
+    <string name="text_historial">HISTORIAL</string>
+    <string name="text_CONFIGURACION">CONFIGURACIÓN</string>
+    <string name="text_batallas">Últimas Batallas</string>
+    <string name="btn_catalan">CATALÁN</string>
+    <string name="btn_castellano">CASTELLANO</string>
+    <string name="btn_ingles">INGLÉS</string>
+    <string name="text_cambiidioma">CAMBIO IDIOMA</string>
+    <string name="texto_VICTORIA">¡VICTORIA!</string>
+    <string name="text_segundos">Duración: 45 seg.</string>
+    <string name="text_marcador">Tú: 5 — 3 CPU</string>
+    <string name="text_AJugar">¡A JUGAR!</string>
+    <string name="text_fecha">Fecha: --/--/----</string>
+    <string name="text_tiempo">Tiempo: 00:00</string>
+    <string name="text_btnstart">¡EMPEZAR!</string>
+    <string name="text_manual">Manual de Supervivencia\n1. Escoge tu arma\n2. Vence a la IA\n          3. ¡Gana monedas!</string>
+    <string name="text_nombre">Introduce tu nombre:</string>
+    <string name="text_escribe">Escribe aquí...</string>
+    <string name="text_entrar">¡ENTRAR!</string>
+    <string name="text_menu">MENÚ</string>
+    <string name="text_btnjugar">JUGAR</string>
+    <string name="text_btnhistorial">HISTORIAL</string>
+    <string name="text_btnconfig">CONFIGURACIÓN</string>
+    <string name="text_configtool">Configuración</string>
+    <string name="text_cerrarSe">Cerrar Sesión</string>
+    <string name="toast_error_partidaguardada"> Error al guardar la partida</string>
+    <string name="toast_partidainiciada">¡Partida iniciada!</string>
+    <string name="msg_guardado_ok">¡Partida guardada con éxito!</string>
+    <string name="msg_empate">¡Empate en esta ronda!</string>
+    <string name="msg_punto_ia">La máquina gana...</string>
+    <string name="titulo_victoria">🏆 ¡VICTORIA!</string>
+    <string name="titulo_derrota">😢 DERROTA</string>
+    <string name="btn_reintentar">REINTENTAR</string>
+    <string name="btn_captura">HACER CAPTURA</string>
+    <string name="btn_historial">VER HISTORIAL</string>
+    <string name="msg_enhorabuena">¡ENHORABUENA! +5 MONEDAS</string>
+    <string name="msg_lo_siento">LO SIENTO... -2 MONEDAS</string>
+    <string name="msg_has_ganado">Has ganado por </string>
+    <string name="msg_ia_ganado">La IA te ha ganado </string>
+    <string name="msg_ahora_tienes">Ahora tienes </string>
+    <string name="msg_monedas_excl"> monedas!!!</string>
+    <string name="msg_tiempo_de">Con un tiempo de </string>
+    <string name="msg_segundos"> segundos</string>
+    <string name="msg_practicando">¡Sigue practicando para el TOP 3!</string>
+    <string name="msg_que_hacer">¿Qué quieres hacer ahora?</string>
+    <string name="titulo_empieza_juego">¡Empieza el juego!</string>
+    <string name="msg_objetivo_juego">¡Consigue 5 Victorias y gana a la IA!</string>
+    <string name="notif_canal_nombre">Resultados de Partida</string>
+    <string name="notif_titulo_victoria">¡Victoria!</string>
+    <string name="notif_cuerpo_ok">Tu partida se ha guardado correctamente en el historial.</string>
+    <string name="titulo_hola">¡Hola!</string>
+    <string name="msg_bienvenida">Bienvenid@, </string>
+    <string name="msg_desafio">. Prepárate para el desafío.</string>
+    <string name="titulo_empieza">¡Empieza el juego!</string>
+    <string name="msg_objetivo">¡Consigue 5 Victorias y gana a la IA!</string>
+    <string name="txt_fecha_label">Fecha: </string>
+    <string name="txt_tiempo_label">Tiempo: </string>
+    <string name="hint_buscar_partida">Buscar partida…</string>
+    <string name="msg_punto_jugador">¡Punto para </string>
+    <string name="historial_tiempo">Tiempo: </string>
+    <string name="historial_victoria">¡VICTORIA!</string>
+    <string name="historial_derrota">DERROTA</string>
+    <string name="text_animaciones">ACTIVAR ANIMACIONES</string>
+    <string name="text_cancion">AÑADIR CANCIÓN</string>
+
+
+
+
+
+
+
 </resources>

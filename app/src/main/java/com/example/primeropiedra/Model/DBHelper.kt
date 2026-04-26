@@ -9,11 +9,11 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.core.Single //Para ir a la base de datos y que traiga la lista y avise que termina
 
-class DBHelper ( context: Context) : SQLiteOpenHelper(context, "JuegoDB", null, 1) {
+class DBHelper ( context: Context) : SQLiteOpenHelper(context, "JuegoDB", null, 2) {
 
     override fun onCreate(db: SQLiteDatabase?) {
         //Creamos la tabla
-        db?.execSQL("CREATE TABLE Historial (id INTEGER PRIMARY KEY AUTOINCREMENT, nombre TEXT, monedas INTEGER, fecha TEXT, duracion INTEGER, resultadoJugador INTEGER, resultadoIA INTEGER)")
+        db?.execSQL("CREATE TABLE Historial (id INTEGER PRIMARY KEY AUTOINCREMENT, nombre TEXT, monedas INTEGER, fecha TEXT, duracion INTEGER, resultadoJugador INTEGER, resultadoIA INTEGER, ubicacion TEXT)")
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
@@ -30,6 +30,7 @@ class DBHelper ( context: Context) : SQLiteOpenHelper(context, "JuegoDB", null, 
                 put("duracion", partida.duracion)
                 put("resultadoJugador", partida.resultadoJugador)
                 put("resultadoIA", partida.resultadoIA)
+                put("ubicacion", partida.ubicacion)
             }
             db.insert("Historial", null, values)
         }.subscribeOn(Schedulers.io())
@@ -50,7 +51,8 @@ class DBHelper ( context: Context) : SQLiteOpenHelper(context, "JuegoDB", null, 
                             fecha = it.getString(it.getColumnIndexOrThrow("fecha")),
                             duracion = it.getInt(it.getColumnIndexOrThrow("duracion")),
                             resultadoJugador = it.getInt(it.getColumnIndexOrThrow("resultadoJugador")),
-                            resultadoIA = it.getInt(it.getColumnIndexOrThrow("resultadoIA"))
+                            resultadoIA = it.getInt(it.getColumnIndexOrThrow("resultadoIA")),
+                            ubicacion = it.getString(it.getColumnIndexOrThrow("ubicacion")) ?: "Sin datos"
 
                         )
                         listaPartidas.add(partida)
@@ -65,14 +67,8 @@ class DBHelper ( context: Context) : SQLiteOpenHelper(context, "JuegoDB", null, 
         return Single.fromCallable {
             val listaPartidas = mutableListOf<PartidaTabla>()
             val db = this.readableDatabase
-
-            // EXPLICACIÓN DEL NUEVO ORDEN:
-            // 1. resultadoJugador DESC: Primero los que llegaron a 5.
-            // 2. resultadoIA ASC: Entre los que ganaron, primero el que recibió menos puntos (el 5-0).
-            // 3. duracion ASC: Si hay empate en marcador, el más rápido gana el puesto.
-
             val sql = """
-            SELECT id, nombre, monedas, fecha, duracion, resultadoJugador, resultadoIA 
+            SELECT id, nombre, monedas, fecha, duracion, resultadoJugador, resultadoIA, ubicacion
             FROM Historial 
             ORDER BY resultadoJugador DESC, resultadoIA ASC, duracion ASC 
             LIMIT 3
@@ -90,7 +86,9 @@ class DBHelper ( context: Context) : SQLiteOpenHelper(context, "JuegoDB", null, 
                             fecha = it.getString(it.getColumnIndexOrThrow("fecha")),
                             duracion = it.getInt(it.getColumnIndexOrThrow("duracion")),
                             resultadoJugador = it.getInt(it.getColumnIndexOrThrow("resultadoJugador")),
-                            resultadoIA = it.getInt(it.getColumnIndexOrThrow("resultadoIA"))
+                            resultadoIA = it.getInt(it.getColumnIndexOrThrow("resultadoIA")),
+                            ubicacion = it.getString(it.getColumnIndexOrThrow("ubicacion")) ?: "Sin datos"
+
                         )
                         listaPartidas.add(partida)
                     } while (it.moveToNext())

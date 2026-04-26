@@ -42,8 +42,23 @@ class MenuInicial : AppCompatActivity() {
 
         dbHelper = DBHelper(this)
 
-        // Capturamos el nombre y lo guardamos en nuestra variable global
-        val nombreJugador = intent.getStringExtra("NOMBRE_JUGADOR") ?: "Jugador"
+        // 1. Abrimos la libreta (SharedPreferences)
+        val prefs = getSharedPreferences("DatosJugador", Context.MODE_PRIVATE)
+
+        // 2. Intentamos recuperar el nombre de 3 sitios en este orden de prioridad:
+        //    A. Del Intent (si acabamos de hacer Login)
+        //    B. De la libreta (si hemos cambiado el idioma)
+        //    C. "Invitado" (si es la primerísima vez que abrimos la App)
+        val nombreJugador = intent.getStringExtra("NOMBRE_JUGADOR")
+            ?: prefs.getString("nombre_guardado", null)
+            ?: "Invitado"
+
+        // 3. Si el nombre no es el genérico, lo guardamos en la libreta para la próxima vez
+        if (nombreJugador != "Invitado") {
+            val editor = prefs.edit()
+            editor.putString("nombre_guardado", nombreJugador)
+            editor.apply()
+        }
 
         // 2. Configuramos el mini recycler
         rvMini = findViewById(R.id.rvMiniHistorial)
@@ -172,35 +187,23 @@ class MenuInicial : AppCompatActivity() {
     }
     private fun mostrarSaludoBienvenida(nombre: String) {
         val builder = android.app.AlertDialog.Builder(this)
-        builder.setTitle("¡Hola!")
-        builder.setMessage("Bienvenid@, $nombre. Prepárate para el desafío.")
+
+        // Título traducido
+        builder.setTitle(getString(R.string.titulo_hola))
+
+        // Mensaje traducido: Pieza 1 + Nombre + Pieza 2
+        val mensajeFinal = getString(R.string.msg_bienvenida) + nombre + getString(R.string.msg_desafio)
+        builder.setMessage(mensajeFinal)
 
         val dialog = builder.create()
         dialog.show()
 
-        // PROGRAMAMOS EL CIERRE AUTOMÁTICO (a los 2.5 segundos)
+        // PROGRAMAMOS EL CIERRE AUTOMÁTICO (a los 4 segundos como tienes tú)
         android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
             if (dialog.isShowing) {
                 dialog.dismiss()
             }
         }, 4000)
     }
-    override fun onResume() {
-        super.onResume()
 
-        val prefs = getSharedPreferences("AjustesApp", MODE_PRIVATE)
-        val musicaActivada = prefs.getBoolean("musica_viva", true)
-
-        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-
-        // Preguntamos si hay otras apps sonando ahora mismo
-        val otraAppSonando = audioManager.isMusicActive
-
-        if (musicaActivada && !otraAppSonando) {
-            // Solo si el usuario quiere música Y Spotify está callado, reanudamos
-            val intent = Intent(this, MusicaService::class.java)
-            intent.action = "REANUDAR_AUDIO"
-            startService(intent)
-        }
-    }
 }

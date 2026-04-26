@@ -36,6 +36,8 @@ class JuegoViewModel : ViewModel() {
     private var tiempoInicio: Long = 0
     private lateinit var db: DBHelper // La inicializamos mas tarde
     private val disposables = CompositeDisposable() // Para cuando utilizad RxJava y el usuario cierra la app, no se pierda nada
+    private var ubicacionActual: String = "Sin datos"
+
 
     // Función para recibir el nombre del Login
     fun setNombreJugador(nombre: String, context: Context) {
@@ -98,6 +100,7 @@ class JuegoViewModel : ViewModel() {
             monedas.value = (monedas.value ?: 0) -2
             mensajeEstado.value = "OOOOOOH... DERROTAAA... -2 MONEDAS"
         }
+
     }
     fun iniciarCronometro() {
         // Guardamos el momento exacto en milisegundos, en el que empieza
@@ -111,6 +114,9 @@ class JuegoViewModel : ViewModel() {
     fun iniBaseDatos(context: Context) {
         db = DBHelper(context)
     }
+    fun setUbicacion(ubi:String) {
+        ubicacionActual = ubi
+    }
     //Para registrar la partida en la base de datos
     fun registrarPartidaBD(duracion: Int, fecha: String) {
         val nombre = nombreUsuario
@@ -118,14 +124,14 @@ class JuegoViewModel : ViewModel() {
         val puntosJugador = victoriasJugador.value ?: 0
         val puntosIA = victoriasIA.value ?: 0
 
-        val nuevaPartida = PartidaTabla(0, nombre, totalMonedas, fecha, duracion, puntosJugador, puntosIA)
+        val nuevaPartida = PartidaTabla(0, nombre, totalMonedas, fecha, duracion, puntosJugador, puntosIA, ubicacionActual)
 
         // Guardamos la tarea en la bolsa, usando add
         disposables.add(
             db.guardarPartidaAsync(nuevaPartida)
                 .observeOn(io.reactivex.rxjava3.android.schedulers.AndroidSchedulers.mainThread())
                 .subscribe({
-                    mensajeEstado.value = "Partida guardada en el historial"
+                    mensajeEstado.value = "NOTIFICACION_VICTORIA"
                 }, { error ->
                     mensajeEstado.value = "Error al guardar: ${error.message}"
                 })
@@ -136,5 +142,6 @@ class JuegoViewModel : ViewModel() {
         super.onCleared()
         disposables.clear()
     }
+
 
 }

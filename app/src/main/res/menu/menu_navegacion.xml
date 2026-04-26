@@ -23,12 +23,12 @@
 
     <item
         android:id="@+id/item_configuracion"
-        android:title="Configuración"
+        android:title="@string/text_configtool"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/item_cerrar_sesion"
-        android:title="Cerrar Sesión"
+        android:title="@string/text_cerrarSe"
         app:showAsAction="never" />
 
 </menu>

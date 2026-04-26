@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="#E91E63"
-        app:title="AYUDA"
+        app:title="@string/text_ayuda"
         app:titleTextColor="#FFFFFF" />
 
     <WebView
