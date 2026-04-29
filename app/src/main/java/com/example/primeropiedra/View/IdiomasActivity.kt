@@ -5,6 +5,7 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.example.primeropiedra.R
 import android.content.Intent
+import com.example.primeropiedra.Services.MusicaService
 import com.example.primeropiedra.Utils.Idioma
 
 class IdiomasActivity : AppCompatActivity(){
@@ -46,5 +47,19 @@ class IdiomasActivity : AppCompatActivity(){
             startActivity(intent)
             finish()
         }
+    }
+    override fun onResume() {
+        super.onResume()
+        // Solo enviamos la orden de reanudar.
+        val intent = Intent(this, MusicaService::class.java)
+        intent.action = "REANUDAR_AUDIO"
+        startService(intent)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        val intent = Intent(this, MusicaService::class.java)
+        intent.action = "PAUSAR_AUDIO"
+        startService(intent)
     }
 }

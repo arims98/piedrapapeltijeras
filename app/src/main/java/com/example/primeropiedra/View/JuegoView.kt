@@ -186,23 +186,28 @@ class JuegoView : AppCompatActivity() {
 
         viewModel.mensajeEstado.observe(this) { mensaje ->
             if (mensaje == "NOTIFICACION_VICTORIA") {
-                // 1. Obtenemos los puntos reales del ViewModel o de tus variables de la clase
                 val puntosFinalesJugador = viewModel.victoriasJugador.value ?: 5
                 val puntosFinalesIA = viewModel.victoriasIA.value ?: 0
 
-                // 2. Pasamos los datos reales a la función del calendario
                 guardarvictoriacalendar(puntosFinalesJugador, puntosFinalesIA)
-                Mensajes.text = getString(R.string.msg_guardado_ok)
+
+                // Usamos baseContext para que no salga en rojo
+                Mensajes.text = baseContext.getString(R.string.msg_guardado_ok)
             } else {
                 val textoTraducido = when {
-                    mensaje == "¡Empate en esta ronda!" -> getString(R.string.msg_empate)
-                    mensaje == "La máquina gana..." -> getString(R.string.msg_punto_ia)
+                    mensaje == "¡Empate en esta ronda!" -> baseContext.getString(R.string.msg_empate)
+                    mensaje == "La máquina gana..." -> baseContext.getString(R.string.msg_punto_ia)
 
-                    // SI EL MENSAJE EMPIEZA POR "¡Punto para", LO TRADUCIMOS
+                    // ESTA ES LA PARTE CLAVE:
                     mensaje.startsWith("¡Punto para") -> {
-                        // Sacamos el nombre (quitamos la parte de "¡Punto para ")
-                        val nombre = mensaje.replace("¡Punto para ", "").replace("!", "")
-                        getString(R.string.msg_punto_jugador) + nombre + "!"
+                        // 1. Limpiamos el mensaje para quedarnos SOLO con el nombre
+                        // Quitamos "¡Punto para " y quitamos el "!" final
+                        val nombreSolo = mensaje.replace("¡Punto para", "")
+                            .replace("!", "")
+                            .trim()
+
+                        // 2. Ahora sí, usamos el String del XML pasándole el nombre limpio
+                        baseContext.getString(R.string.msg_punto_jugador, nombreSolo)
                     }
 
                     else -> mensaje
@@ -282,6 +287,7 @@ class JuegoView : AppCompatActivity() {
 
             builder.setTitle(getString(R.string.titulo_victoria))
             builder.setIcon(android.R.drawable.btn_star_big_on)
+            lanzarNotificacionVictoria()
 
 
             getString(R.string.msg_enhorabuena) + "\n\n" +
@@ -305,6 +311,7 @@ class JuegoView : AppCompatActivity() {
         }
 
         builder.setMessage(mensajeCompleto)
+
 
         builder.setPositiveButton(getString(R.string.btn_reintentar)) { _, _ ->
             // Simulamos el click del botón start para reiniciar todo
@@ -376,7 +383,7 @@ class JuegoView : AppCompatActivity() {
                         // 2. Si no hay texto, escondemos el listado de búsqueda y vemos el menú normal
                         rvResultados.visibility = android.view.View.GONE
                     } else {
-                        // 3. Si el usuario escribe, mostramos el listado de resultados encima de TODO
+                        // 3. Si el usuario escribe, mostramos el listado de resultados encima
                         rvResultados.visibility = android.view.View.VISIBLE
 
                         // 4. Ejecutamos el filtrado con el texto que escribió el usuario
@@ -423,7 +430,7 @@ class JuegoView : AppCompatActivity() {
 
             }
 
-            else -> super.onOptionsItemSelected(item) //Aqui debo poner para ir a la pagina de login
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
@@ -537,15 +544,23 @@ class JuegoView : AppCompatActivity() {
             )
             notificationManager.createNotificationChannel(canal)
         }
+        // 1. Creamos el estilo expandible (BigTextStyle)
+        val estiloExpandido = NotificationCompat.BigTextStyle()
+            .setBigContentTitle("¡Victoria Detallada!") // Título que se ve al expandir
+            .bigText("Has completado la partida con éxito.\n" +
+                    "Tiempo total de resolución: $segundosTranscurridos segundos.\n" +
+                    "¡Buen trabajo!") // Texto largo que aparece al desplegar
 
         val builder = NotificationCompat.Builder(this@JuegoView, canalId)
-            .setSmallIcon(android.R.drawable.ic_dialog_info) // Usa este del sistema para asegurar que no crashea
+            .setSmallIcon(R.drawable.ic_stat_name) //Icono personalizado
             .setContentTitle("¡Victoria!")
             .setContentText("Tu partida se ha guardado correctamente en el historial.") // OBLIGATORIO
+            .setStyle(estiloExpandido)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
 
         notificationManager.notify(101, builder.build())
+
     }
 
     override fun onActivityResult(
@@ -578,6 +593,13 @@ class JuegoView : AppCompatActivity() {
                             outputStream
                         )
                         //Toast.makeText(this, "Imagen guardada con éxito", Toast.LENGTH_SHORT).show()
+
+                        val intent = Intent(this, MenuInicial::class.java)
+
+                        // Limpiamos el historial para que no pueda volver atrás al juego acabado
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+                        finish()
 
                     }
                 } catch (e: Exception) {
@@ -614,7 +636,7 @@ class JuegoView : AppCompatActivity() {
                 // 2. Configuramos los datos del evento
                 values.put(CalendarContract.Events.DTSTART, startMillis)
                 values.put(CalendarContract.Events.DTEND, endMillis)
-                values.put(CalendarContract.Events.TITLE, "Juego PPT: ¡Victoria!")
+                values.put(CalendarContract.Events.TITLE, "Juego ¡Primero, Piedra! --> ¡Victoria!")
                 values.put(CalendarContract.Events.DESCRIPTION, "Ganaste a la IA $puntosJugador a $puntosIA")
 
                 // Usamos el ID 1 (calendario principal por defecto en el 99% de Android)
@@ -631,6 +653,22 @@ class JuegoView : AppCompatActivity() {
                 Log.e("CALENDARIO", "Error de permisos o de inserción: ${e.message}")
             }
         }.start()
+    }
+    override fun onResume() {
+        super.onResume()
+        // Solo enviamos la orden de reanudar.
+        // El Service, gracias al cambio que hicimos arriba con isMusicActive,
+        // decidirá si suena o si respeta a Spotify.
+        val intent = Intent(this, MusicaService::class.java)
+        intent.action = "REANUDAR_AUDIO"
+        startService(intent)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        val intent = Intent(this, MusicaService::class.java)
+        intent.action = "PAUSAR_AUDIO"
+        startService(intent)
     }
 }
 

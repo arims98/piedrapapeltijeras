@@ -39,6 +39,7 @@ class Configuracion : AppCompatActivity() {
     private var sonidoClicId: Int = 0
     lateinit var btnIdioma: Button
     lateinit var btnAnimaciones: Button
+    lateinit var btnCancion: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,10 +74,16 @@ class Configuracion : AppCompatActivity() {
 
         btnMusica = findViewById(R.id.btnMusica)
 
-        // --- CONFIGURACIÓN DE ANIMACIONES Y SOUNDPOOL ---
+        // Comprobamos el estado inicial nada más abrir la pantalla
+        if (musicaEncendida) {
+            btnMusica.setImageResource(R.drawable.music)
+        } else {
+            btnMusica.setImageResource(R.drawable.nomusic)
+        }
+
+        // --- CONFIGURACIÓN DE ANIMACIONES BOTÓN MÚSICA ---
         val fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in)
         val fadeOut = AnimationUtils.loadAnimation(this, R.anim.fade_out)
-        // ... (Tu código de AudioAttributes y SoundPool aquí) ...
 
         // --- LÓGICA DEL BOTÓN DE MÚSICA ---
         btnMusica.setOnClickListener {
@@ -84,7 +91,7 @@ class Configuracion : AppCompatActivity() {
             btnMusica.startAnimation(fadeOut)
 
             Handler(Looper.getMainLooper()).postDelayed({
-                val intentService = Intent(this, MusicaService::class.java) // CAMBIO: Siempre usaremos este intent
+                val intentService = Intent(this, MusicaService::class.java)
 
                 if (musicaEncendida) {
                     // --- MÚSICA SE APAGA ---
@@ -121,6 +128,13 @@ class Configuracion : AppCompatActivity() {
         btnAnimaciones = findViewById(R.id.btnAnimaciones)
 
         btnAnimaciones.setOnClickListener { }
+
+        btnCancion = findViewById(R.id.btnCancion)
+
+        btnCancion.setOnClickListener {
+            val intent = Intent(this, CancionView::class.java)
+            startActivity(intent)
+        }
 
     }
     //Para quitar ajutes del toolbar en esta pagina
@@ -204,6 +218,22 @@ class Configuracion : AppCompatActivity() {
         if (::soundPool.isInitialized) {
             soundPool.release() // Esto libera la memoria RAM (Punto 1.c)
         }
+    }
+    override fun onResume() {
+        super.onResume()
+        // Solo enviamos la orden de reanudar.
+        // El Service, gracias al cambio que hicimos arriba con isMusicActive,
+        // decidirá si suena o si respeta a Spotify.
+        val intent = Intent(this, MusicaService::class.java)
+        intent.action = "REANUDAR_AUDIO"
+        startService(intent)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        val intent = Intent(this, MusicaService::class.java)
+        intent.action = "PAUSAR_AUDIO"
+        startService(intent)
     }
 
 }

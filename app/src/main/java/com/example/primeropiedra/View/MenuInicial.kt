@@ -94,8 +94,6 @@ class MenuInicial : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        mostrarSaludoBienvenida(nombreJugador)
-
         btnJugar.setOnClickListener {
             val ticket = Intent(this, JuegoView::class.java)
             ticket.putExtra("nombreUsuario", nombreJugador)
@@ -185,25 +183,20 @@ class MenuInicial : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item) //Aqui debo poner para ir a la pagina de login
         }
     }
-    private fun mostrarSaludoBienvenida(nombre: String) {
-        val builder = android.app.AlertDialog.Builder(this)
 
-        // Título traducido
-        builder.setTitle(getString(R.string.titulo_hola))
+    override fun onResume() {
+        super.onResume()
+        // Solo enviamos la orden de reanudar.
+        val intent = Intent(this, MusicaService::class.java)
+        intent.action = "REANUDAR_AUDIO"
+        startService(intent)
+    }
 
-        // Mensaje traducido: Pieza 1 + Nombre + Pieza 2
-        val mensajeFinal = getString(R.string.msg_bienvenida) + nombre + getString(R.string.msg_desafio)
-        builder.setMessage(mensajeFinal)
-
-        val dialog = builder.create()
-        dialog.show()
-
-        // PROGRAMAMOS EL CIERRE AUTOMÁTICO (a los 4 segundos como tienes tú)
-        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-            if (dialog.isShowing) {
-                dialog.dismiss()
-            }
-        }, 4000)
+    override fun onPause() {
+        super.onPause()
+        val intent = Intent(this, MusicaService::class.java)
+        intent.action = "PAUSAR_AUDIO"
+        startService(intent)
     }
 
 }

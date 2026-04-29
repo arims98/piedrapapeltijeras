@@ -48,6 +48,9 @@
         <activity
             android:name=".View.IdiomasActivity"
             android:exported="false" />
+        <activity
+            android:name=".View.CancionView"
+            android:exported="false" />
 
     </application>
 

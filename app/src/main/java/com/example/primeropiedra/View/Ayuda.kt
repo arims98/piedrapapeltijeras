@@ -1,5 +1,6 @@
 package com.example.primeropiedra.View
 
+import android.content.Intent
 import android.os.Bundle
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -7,6 +8,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import com.example.primeropiedra.R
 import androidx.activity.OnBackPressedCallback //Para que la flecha de la toolbar también funcione para volver atras dentro de la app
+import com.example.primeropiedra.Services.MusicaService
 
 class Ayuda : AppCompatActivity() {
     private lateinit var webView: WebView
@@ -61,6 +63,22 @@ class Ayuda : AppCompatActivity() {
         } else {
             super.onBackPressedDispatcher
         }
+    }
+    override fun onResume() {
+        super.onResume()
+        // Solo enviamos la orden de reanudar.
+        // El Service, gracias al cambio que hicimos arriba con isMusicActive,
+        // decidirá si suena o si respeta a Spotify.
+        val intent = Intent(this, MusicaService::class.java)
+        intent.action = "REANUDAR_AUDIO"
+        startService(intent)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        val intent = Intent(this, MusicaService::class.java)
+        intent.action = "PAUSAR_AUDIO"
+        startService(intent)
     }
 
 

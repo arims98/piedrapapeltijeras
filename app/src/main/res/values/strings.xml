@@ -1,6 +1,6 @@
 <resources>
     <string name="text_ayuda">AYUDA</string>
-    <string name="text_musica">Música</string>
+    <string name="text_musica">Música juego</string>
     <string name="text_idioma">IDIOMA</string>
     <string name="text_confi">CONFIGURACIÓN</string>
     <string name="text_historial">HISTORIAL</string>
@@ -40,7 +40,7 @@
     <string name="msg_enhorabuena">¡ENHORABUENA! +5 MONEDAS</string>
     <string name="msg_lo_siento">LO SIENTO... -2 MONEDAS</string>
     <string name="msg_has_ganado">Has ganado por </string>
-    <string name="msg_ia_ganado">La IA te ha ganado </string>
+    <string name="msg_ia_ganado">"La IA te ha ganado   "</string>
     <string name="msg_ahora_tienes">Ahora tienes </string>
     <string name="msg_monedas_excl"> monedas!!!</string>
     <string name="msg_tiempo_de">Con un tiempo de </string>
@@ -60,12 +60,16 @@
     <string name="txt_fecha_label">Fecha: </string>
     <string name="txt_tiempo_label">Tiempo: </string>
     <string name="hint_buscar_partida">Buscar partida…</string>
-    <string name="msg_punto_jugador">¡Punto para </string>
+    <string name="msg_punto_jugador">¡Punto para %s</string>
     <string name="historial_tiempo">Tiempo: </string>
     <string name="historial_victoria">¡VICTORIA!</string>
     <string name="historial_derrota">DERROTA</string>
     <string name="text_animaciones">ACTIVAR ANIMACIONES</string>
-    <string name="text_cancion">AÑADIR CANCIÓN</string>
+    <string name="text_cancion">AJUSTES DE TU MÚSICA</string>
+    <string name="text_cancion_apagar">SILENCIA TU CANCIÓN</string>
+    <string name="text_tumusica">Tú música</string>
+    <string name="text_elegir">Escoge tu canción</string>
+    <string name="text_cancionseleccionada"> Canción añadida correctamente.</string>
 
 
 
