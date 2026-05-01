@@ -60,7 +60,7 @@
     <string name="txt_fecha_label">Fecha: </string>
     <string name="txt_tiempo_label">Tiempo: </string>
     <string name="hint_buscar_partida">Buscar partida…</string>
-    <string name="msg_punto_jugador">¡Punto para %s</string>
+    <string name="msg_punto_jugador">¡Punto para %s!</string>
     <string name="historial_tiempo">Tiempo: </string>
     <string name="historial_victoria">¡VICTORIA!</string>
     <string name="historial_derrota">DERROTA</string>

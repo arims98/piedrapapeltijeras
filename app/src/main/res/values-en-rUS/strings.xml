@@ -16,8 +16,8 @@
     <string name="txt_fecha">Date:</string>
     <string name="hint_buscar">Find game:</string>
     <string name="msg_guardado_ok">¡Game saved!</string>
-    <string name="msg_empate">Draw in this round</string>
-    <string name="msg_punto_jugador">Point for %s</string>
+    <string name="msg_empate">¡raw in this round!</string>
+    <string name="msg_punto_jugador">¡Point for %s!</string>
     <string name="msg_punto_ia">The IA wins..</string>
     <string name="msg_victoria_total">WIIIIIN</string>
     <string name="msg_derrota_total">YOU LOSE</string>
@@ -58,7 +58,7 @@
     <string name="text_configtool">Settings</string>
     <string name="text_cerrarSe">Sign Out</string>
     <string name="toast_error_partidaguardada">Wrong saving the game</string>
-    <string name="toast_partidainiciada">Game start</string>
+    <string name="toast_partidainiciada">¡Game start!</string>
     <string name="msg_enhorabuena">¡CONGRATULATIONS +5 COINS!</string>
     <string name="msg_lo_siento">" SORRY... -2 COINS"</string>
     <string name="msg_has_ganado">"You win "</string>
@@ -67,7 +67,7 @@
     <string name="msg_monedas_excl">" coins!!!"</string>
     <string name="msg_tiempo_de">"With a time of "</string>
     <string name="msg_segundos">" seconds"</string>
-    <string name="msg_practicando">Keep practing for TOP 3</string>
+    <string name="msg_practicando">¡Keep practing for TOP 3!</string>
     <string name="msg_que_hacer">What do you want to do?</string>
     <string name="titulo_empieza_juego">¡The game start!</string>
     <string name="msg_objetivo_juego">¡Get 5 wins and beat the AI!</string>

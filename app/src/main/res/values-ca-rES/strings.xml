@@ -17,7 +17,7 @@
     <string name="hint_buscar">Buscar partida...</string>
     <string name="msg_guardado_ok">¡Partida guardada amb exit!</string>
     <string name="msg_empate">¡Empat aquesta ronda!</string>
-    <string name="msg_punto_jugador">Punt per %s</string>
+    <string name="msg_punto_jugador">¡Punt per %s!</string>
     <string name="msg_punto_ia">La màquina guanya...</string>
     <string name="msg_victoria_total">VICTORIA TOTAL</string>
     <string name="msg_derrota_total">HAS PERDUT</string>
@@ -67,7 +67,7 @@
     <string name="msg_monedas_excl">" monedas!!!"</string>
     <string name="msg_tiempo_de">"Amb un temps de "</string>
     <string name="msg_segundos">" segons"</string>
-    <string name="msg_practicando">Segueix practicant per el TOP 3</string>
+    <string name="msg_practicando">¡Segueix practicant per el TOP 3!</string>
     <string name="msg_que_hacer">¿Què vols fer ara?</string>
     <string name="titulo_empieza_juego">¡Comença el joc!</string>
     <string name="msg_objetivo_juego">¡Consegueix 5 victorias y guanyar a la IA!</string>

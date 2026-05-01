@@ -42,6 +42,7 @@ import android.media.AudioManager
 import android.os.Build
 import android.provider.CalendarContract
 import androidx.core.app.NotificationCompat
+import android.text.Html
 
 class JuegoView : AppCompatActivity() {
     var nombreJugador: String = ""
@@ -284,43 +285,38 @@ class JuegoView : AppCompatActivity() {
         val monedasActuales = viewModel.monedas.value ?: 0
 
         val mensajeCompleto = if (victoria) {
-
             builder.setTitle(getString(R.string.titulo_victoria))
             builder.setIcon(android.R.drawable.btn_star_big_on)
             lanzarNotificacionVictoria()
 
-
-            getString(R.string.msg_enhorabuena) + "\n\n" +
-                    getString(R.string.msg_has_ganado) + "$puntosJugador a $puntosIA.\n" +
-                    getString(R.string.msg_ahora_tienes) + "$monedasActuales" + getString(R.string.msg_monedas_excl) + "\n" +
-                    getString(R.string.msg_tiempo_de) + "$segundosTranscurridos" + getString(R.string.msg_segundos) + "\n\n" +
-                    getString(R.string.msg_que_hacer)
+            // Usamos <br> para saltos de línea y <b> para resaltar datos
+            "<b>" + getString(R.string.msg_enhorabuena) + "</b><br><br>" +
+                    getString(R.string.msg_has_ganado) + " <b>$puntosJugador</b> a <b>$puntosIA</b>.<br>" +
+                    getString(R.string.msg_ahora_tienes) + " <b>$monedasActuales</b> " + getString(R.string.msg_monedas_excl) + "<br>" +
+                    getString(R.string.msg_tiempo_de) + " <b>$segundosTranscurridos</b> " + getString(R.string.msg_segundos) + "<br><br>" +
+                    "<i>" + getString(R.string.msg_que_hacer) + "</i>"
 
         } else {
-
             builder.setTitle(getString(R.string.titulo_derrota))
             builder.setIcon(android.R.drawable.ic_delete)
 
-
-            getString(R.string.msg_lo_siento) + "\n\n" +
-                    getString(R.string.msg_ia_ganado) + "$puntosIA a $puntosJugador.\n" +
-                    getString(R.string.msg_ahora_tienes) + "$monedasActuales monedas...\n" +
-                    getString(R.string.msg_tiempo_de) + "$segundosTranscurridos" + getString(R.string.msg_segundos) + "\n\n" +
-                    getString(R.string.msg_practicando) + "\n" +
-                    getString(R.string.msg_que_hacer)
+            "<b>" + getString(R.string.msg_lo_siento) + "</b><br><br>" +
+                    getString(R.string.msg_ia_ganado) + " <b>$puntosIA</b> a <b>$puntosJugador</b>.<br>" +
+                    getString(R.string.msg_ahora_tienes) + " <b>$monedasActuales</b> monedas...<br>" +
+                    getString(R.string.msg_tiempo_de) + " <b>$segundosTranscurridos</b> " + getString(R.string.msg_segundos) + "<br><br>" +
+                    "<i>" + getString(R.string.msg_practicando) + "</i><br>" +
+                    "<i>" + getString(R.string.msg_que_hacer) + "</i>"
         }
 
-        builder.setMessage(mensajeCompleto)
-
+        // Usamos Html.fromHtml para que el diálogo interprete las etiquetas <b>, <br> e <i>
+        builder.setMessage(Html.fromHtml(mensajeCompleto, Html.FROM_HTML_MODE_COMPACT))
 
         builder.setPositiveButton(getString(R.string.btn_reintentar)) { _, _ ->
-            // Simulamos el click del botón start para reiniciar todo
             btnStart.performClick()
         }
 
         builder.setNeutralButton(getString(R.string.btn_captura)) { _, _ ->
-            val nombreArchivo =
-                "Resultado_PiedraPapelTijeras_${System.currentTimeMillis()}.png"
+            val nombreArchivo = "Resultado_PiedraPapelTijeras_${System.currentTimeMillis()}.png"
             val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
                 type = "image/png"
@@ -336,7 +332,7 @@ class JuegoView : AppCompatActivity() {
         }
 
         val dialog = builder.create()
-        dialog.setCancelable(false) // Obligamos a elegir una opción
+        dialog.setCancelable(false)
         dialog.show()
     }
 
@@ -654,22 +650,7 @@ class JuegoView : AppCompatActivity() {
             }
         }.start()
     }
-    override fun onResume() {
-        super.onResume()
-        // Solo enviamos la orden de reanudar.
-        // El Service, gracias al cambio que hicimos arriba con isMusicActive,
-        // decidirá si suena o si respeta a Spotify.
-        val intent = Intent(this, MusicaService::class.java)
-        intent.action = "REANUDAR_AUDIO"
-        startService(intent)
-    }
 
-    override fun onPause() {
-        super.onPause()
-        val intent = Intent(this, MusicaService::class.java)
-        intent.action = "PAUSAR_AUDIO"
-        startService(intent)
-    }
 }
 
 

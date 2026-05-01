@@ -64,23 +64,4 @@ class Ayuda : AppCompatActivity() {
             super.onBackPressedDispatcher
         }
     }
-    override fun onResume() {
-        super.onResume()
-        // Solo enviamos la orden de reanudar.
-        // El Service, gracias al cambio que hicimos arriba con isMusicActive,
-        // decidirá si suena o si respeta a Spotify.
-        val intent = Intent(this, MusicaService::class.java)
-        intent.action = "REANUDAR_AUDIO"
-        startService(intent)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        val intent = Intent(this, MusicaService::class.java)
-        intent.action = "PAUSAR_AUDIO"
-        startService(intent)
-    }
-
-
-
 }
