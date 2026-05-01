@@ -1,4 +1,5 @@
 Primero Piedra 🪨📄✂️
+
 ¡Bienvenido a Primero Piedra, una versión moderna y completa del clásico juego de Piedra, Papel o Tijera desarrollada para Android!
 
 📝 Descripción
