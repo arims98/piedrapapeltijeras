@@ -184,19 +184,6 @@ class MenuInicial : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        // Solo enviamos la orden de reanudar.
-        val intent = Intent(this, MusicaService::class.java)
-        intent.action = "REANUDAR_AUDIO"
-        startService(intent)
-    }
 
-    override fun onPause() {
-        super.onPause()
-        val intent = Intent(this, MusicaService::class.java)
-        intent.action = "PAUSAR_AUDIO"
-        startService(intent)
-    }
 
 }
