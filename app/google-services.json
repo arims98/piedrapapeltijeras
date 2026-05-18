@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "263653781488",
+    "project_id": "primero-piedra",
+    "storage_bucket": "primero-piedra.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:263653781488:android:1157e5d48bc91e2523b735",
+        "android_client_info": {
+          "package_name": "com.example.primeropiedra"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBFvhGKA9Xiz8lbkKnYviuYR0WkZi4Xvg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

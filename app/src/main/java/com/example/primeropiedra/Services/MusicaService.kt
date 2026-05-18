@@ -57,7 +57,7 @@ class MusicaService : Service() {
         when (intent?.action) {
             "REANUDAR_AUDIO" -> iniciarMusica()
             "PAUSAR_AUDIO" -> mediaPlayer?.pause()
-            "RECARGAR_MUSICA" -> prepararMediaPlayer() // Por si cambias de canción
+            "RECARGAR_MUSICA" -> prepararMediaPlayer()
         }
         return START_STICKY
     }

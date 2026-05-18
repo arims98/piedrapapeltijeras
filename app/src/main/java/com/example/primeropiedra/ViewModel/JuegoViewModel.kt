@@ -15,10 +15,12 @@ package com.example.primeropiedra.ViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import android.content.Context
-import android.widget.TextView
+import androidx.lifecycle.viewModelScope
+import com.example.primeropiedra.JuegoRepositorio
 import com.example.primeropiedra.Model.DBHelper
 import com.example.primeropiedra.Model.PartidaTabla
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import kotlinx.coroutines.launch
 
 
 // Heredamos de ViewModel para que Android sepa que esta es la "caja fuerte"
@@ -37,6 +39,12 @@ class JuegoViewModel : ViewModel() {
     private lateinit var db: DBHelper // La inicializamos mas tarde
     private val disposables = CompositeDisposable() // Para cuando utilizad RxJava y el usuario cierra la app, no se pierda nada
     private var ubicacionActual: String = "Sin datos"
+
+    // Instanciamos el repositorio que acabamos de crear en la otra carpeta
+    private val juegoRepositorio = JuegoRepositorio()
+
+    // Creamos un ID único temporal para este jugador para que se guarde en su propia casilla en Firebase
+    private val jugadorUid = "jugador_${System.currentTimeMillis()}"
 
 
     // Función para recibir el nombre del Login
@@ -93,12 +101,25 @@ class JuegoViewModel : ViewModel() {
         val vJ = victoriasJugador.value ?: 0
         val vIA = victoriasIA.value ?: 0
 
+        val nombre = nombreUsuario
+
         if ( vJ >= 5) {
             monedas.value = (monedas.value ?: 0) +5
             mensajeEstado.value = "¡VICTORIA TOTAL!!! +5 MONEDAS"
+
+            // Usamos viewModelScope porque estamos dentro del ViewModel
+            viewModelScope.launch {
+
+                juegoRepositorio.guardarPuntuacion(nombre, vJ, jugadorUid)
+            }
+
         } else if (vIA >= 5) {
             monedas.value = (monedas.value ?: 0) -2
             mensajeEstado.value = "OOOOOOH... DERROTAAA... -2 MONEDAS"
+
+            viewModelScope.launch {
+                juegoRepositorio.guardarPuntuacion(nombre, vJ, jugadorUid)
+            }
         }
 
     }

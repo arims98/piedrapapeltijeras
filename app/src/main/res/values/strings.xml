@@ -20,7 +20,7 @@
     <string name="text_manual">Manual de Supervivencia\n1. Escoge tu arma\n2. Vence a la IA\n          3. ¡Gana monedas!</string>
     <string name="text_nombre">Introduce tu nombre:</string>
     <string name="text_escribe">Escribe aquí...</string>
-    <string name="text_entrar">¡ENTRAR!</string>
+    <string name="text_entrar">Entrar como invitado</string>
     <string name="text_menu">MENÚ</string>
     <string name="text_btnjugar">JUGAR</string>
     <string name="text_btnhistorial">HISTORIAL</string>
